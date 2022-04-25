@@ -1,0 +1,28 @@
+main {
+  min-height: 90vh;
+}
+.fa-edit:hover {
+  color: rgb(0, 174, 255);
+}
+
+.fa-times {
+  color: red;
+}
+
+.fa-check {
+  color: green;
+}
+
+.fa-ban:hover {
+  color: rgb(255, 0, 0);
+}
+.fa-pen-alt:hover {
+  color: rgb(218, 87, 12);
+}
+
+.cardStyle {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  max-height: 60vh;
+}
