@@ -5,38 +5,60 @@ import OrderSummary from './../components/OrderSummary';
 import SubtotalSummary from './../components/SubtotalSummary';
 import { postOrder } from '../actions/orderActions';
 import { deleteCartItem } from '../actions/cartActions';
+import notify from '../utils/notify';
+import { listCartItems } from '../actions/cartActions';
 
 const PlaceOrderScreen = ({ history }) => {
   const { userInfo } = useSelector((state) => state.userLogin);
   const { cartItems } = useSelector((state) => state.cart);
-  const { order } = useSelector((state) => state.postOrder);
+
   const dispatch = useDispatch();
   const [hoten, setHoten] = useState(userInfo.hoten);
   const [diachi, setDiachi] = useState(userInfo.diachi);
   const [sodienthoai, setSodienthoai] = useState(userInfo.sodienthoai);
-  const [email, setEmail] = useState(userInfo.email);
-
-  const subtotal =
-    cartItems &&
-    cartItems.reduce((acc, item) => acc + item.tongtien, 0).toFixed(2) * 1;
 
   useEffect(() => {
     if (!userInfo) {
       history.push('/login?redirect=placeorder');
     }
   }, [userInfo]);
+  useEffect(() => {
+    dispatch(listCartItems());
+  }, []);
+
+  const subtotal =
+    cartItems &&
+    cartItems.reduce((acc, item) => acc + item.tongtien, 0).toFixed(2) * 1;
+
+  const {
+    order,
+    loading: loadingPostOrder,
+    error: errorPostOrder,
+    success: successPostOrder,
+  } = useSelector((state) => state.postOrder);
+  useEffect(() => {
+    if (!loadingPostOrder && (successPostOrder || errorPostOrder)) {
+      if (successPostOrder) notify(false, 'Đơn hàng được đặt thành công!');
+      else notify(true, errorPostOrder);
+      dispatch({
+        type: 'POST_ORDER_RESET',
+      });
+    }
+  }, [loadingPostOrder]);
 
   useEffect(() => {
     if (order) {
-      cartItems.forEach((item) => {
-        dispatch(deleteCartItem(item.sachid));
-      });
-      history.push(`/orders/${order.id}`);
+      setTimeout(() => {
+        cartItems.forEach((item) => {
+          dispatch(deleteCartItem(item.sachid));
+        });
+        history.push(`/orders/${order.id}`);
+      }, 500);
     }
   }, [order]);
 
   const submitHandler = (e) => {
-    console.log(hoten, diachi, sodienthoai, email);
+    console.log(hoten, diachi, sodienthoai);
     dispatch(
       postOrder({
         api_khachhang: userInfo.id,
@@ -90,16 +112,6 @@ const PlaceOrderScreen = ({ history }) => {
                       value={sodienthoai}
                       onChange={(e) => setSodienthoai(e.target.value)}
                       placeholder='Số điện thoại của bạn'
-                    />
-                  </Form.Group>
-                  <Form.Group as={Col} controlId='email'>
-                    <Form.Label>Email</Form.Label>
-                    <Form.Control
-                      size='sm'
-                      type='text'
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder='Email của bạn'
                     />
                   </Form.Group>
                 </Form.Row>

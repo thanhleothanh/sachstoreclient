@@ -14,6 +14,8 @@ import OrderScreen from './screens/OrderScreen';
 import ADMINUsers from './screens/ADMIN-Users';
 import ADMINProducts from './screens/ADMIN-Products';
 import ADMINOrders from './screens/ADMIN-Orders';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
   return (
@@ -33,6 +35,17 @@ const App = () => {
           <Route path='/admin/products' component={ADMINProducts} />
           <Route path='/admin/orders' component={ADMINOrders} />
         </Container>
+        <ToastContainer
+          position='bottom-right'
+          autoClose={1000}
+          hideProgressBar
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss={false}
+          draggable
+          pauseOnHover={false}
+        />
       </main>
       <Footer />
     </BrowserRouter>

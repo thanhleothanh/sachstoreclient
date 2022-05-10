@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import notify from '../utils/notify';
 import {
   Row,
   Col,
@@ -27,6 +28,38 @@ const CartScreen = ({ history }) => {
   useEffect(() => {
     dispatch(listCartItems());
   }, []);
+
+  const {
+    loading: loadingUpdateCart,
+    success: successUpdateCart,
+    error: errorUpdateCart,
+  } = useSelector((state) => state.updateCart);
+  useEffect(() => {
+    if (!loadingUpdateCart && (successUpdateCart || errorUpdateCart)) {
+      if (successUpdateCart)
+        notify(false, 'Cập nhật số lượng sản phẩm trong giỏ thành công!');
+      else notify(true, errorUpdateCart);
+      dispatch({
+        type: 'CART_UPDATE_ITEM_RESET',
+      });
+    }
+  }, [loadingUpdateCart]);
+
+  const {
+    loading: loadingDeleteCart,
+    success: successDeleteCart,
+    error: errorDeleteCart,
+  } = useSelector((state) => state.deleteCart);
+  useEffect(() => {
+    if (!loadingDeleteCart && (successDeleteCart || errorDeleteCart)) {
+      if (successDeleteCart)
+        notify(false, 'Xoá sản phẩm khỏi giỏ hàng thành công!');
+      else notify(true, errorDeleteCart);
+      dispatch({
+        type: 'CART_DELETE_ITEM_RESET',
+      });
+    }
+  }, [loadingDeleteCart]);
 
   const updateCartItemHandler = (sachid, soluongmoi) => {
     dispatch(updateCartItem(sachid, soluongmoi));
@@ -63,8 +96,52 @@ const CartScreen = ({ history }) => {
         ) : (
           cartItems && (
             <Row>
-              <Col md={8}>
+              <Col md={4}>
                 <h2>Giỏ hàng của bạn</h2>
+                <Card>
+                  <ListGroup variant='flush'>
+                    <ListGroupItem>
+                      <h4>
+                        Tổng cộng: (
+                        {cartItems.reduce((acc, item) => acc + item.soluong, 0)}
+                        ) Sản phẩm
+                      </h4>
+                    </ListGroupItem>
+                    <ListGroupItem>
+                      <strong>Tổng tiền: </strong>
+                      {cartItems
+                        .reduce((acc, item) => acc + item.tongtien, 0)
+                        .toLocaleString('vi', {
+                          style: 'currency',
+                          currency: 'VND',
+                        })}
+                    </ListGroupItem>
+                    <ListGroupItem>
+                      <Button
+                        type='button'
+                        className='btn-block'
+                        disabled={
+                          cartItems.length === 0 ||
+                          cartItems.reduce((acc, item) => acc + item.qty, 0) *
+                            1 ===
+                            0
+                        }
+                        onClick={() => checkoutHandler()}
+                      >
+                        Đặt hàng
+                      </Button>
+                    </ListGroupItem>
+                  </ListGroup>
+                </Card>
+                {cartItems.length !== 0 && (
+                  <Link to='/'>
+                    <Button className='btn mt-3' block>
+                      <strong>Tiếp tục mua sắm</strong>
+                    </Button>
+                  </Link>
+                )}
+              </Col>
+              <Col md={8}>
                 {cartItems && cartItems.length === 0 ? (
                   <Message>
                     {'Không có sản phẩm nào trong giỏ hàng!'}
@@ -136,50 +213,6 @@ const CartScreen = ({ history }) => {
                     ))}
                   </ListGroup>
                 )}
-                {cartItems.length !== 0 && (
-                  <Link to='/'>
-                    <Button className='btn mt-3' block>
-                      <strong>Tiếp tục mua sắm</strong>
-                    </Button>
-                  </Link>
-                )}
-              </Col>
-              <Col md={4}>
-                <Card>
-                  <ListGroup variant='flush'>
-                    <ListGroupItem>
-                      <h4>
-                        Tổng cộng: (
-                        {cartItems.reduce((acc, item) => acc + item.soluong, 0)}
-                        ) Sản phẩm
-                      </h4>
-                    </ListGroupItem>
-                    <ListGroupItem>
-                      <strong>Tổng tiền: </strong>
-                      {cartItems
-                        .reduce((acc, item) => acc + item.tongtien, 0)
-                        .toLocaleString('vi', {
-                          style: 'currency',
-                          currency: 'VND',
-                        })}
-                    </ListGroupItem>
-                    <ListGroupItem>
-                      <Button
-                        type='button'
-                        className='btn-block'
-                        disabled={
-                          cartItems.length === 0 ||
-                          cartItems.reduce((acc, item) => acc + item.qty, 0) *
-                            1 ===
-                            0
-                        }
-                        onClick={() => checkoutHandler()}
-                      >
-                        Đặt hàng
-                      </Button>
-                    </ListGroupItem>
-                  </ListGroup>
-                </Card>
               </Col>
             </Row>
           )

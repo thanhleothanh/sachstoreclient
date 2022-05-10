@@ -50,7 +50,7 @@ const AllOrdersFromUser = () => {
                   {!item.donhangisthanhtoan ? (
                     ''
                   ) : item.thoigianthanhtoan ? (
-                    'on ' + item.paidAt.substring(0, 10)
+                    ': ' + item.thoigianthanhtoan
                   ) : (
                     <i className='fas fa-question-circle mx-3' />
                   )}

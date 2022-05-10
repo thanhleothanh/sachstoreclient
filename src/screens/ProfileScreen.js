@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Row, Col, Alert } from 'react-bootstrap';
+import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUserDetails } from './../actions/userActions';
 import AllOrdersFromUser from './../components/AllOrdersFromUser';
+import notify from '../utils/notify';
 
 const ProfileScreen = ({ history }) => {
   const [hoten, setHoten] = useState('');
@@ -26,6 +27,22 @@ const ProfileScreen = ({ history }) => {
     }
   }, [userInfo]);
 
+  const {
+    loading: loadingUpdateUser,
+    success: successUpdateUser,
+    error: errorUpdateUser,
+  } = useSelector((state) => state.userUpdateDetails);
+  useEffect(() => {
+    if (!loadingUpdateUser && (successUpdateUser || errorUpdateUser)) {
+      if (successUpdateUser)
+        notify(false, 'Bạn đã cập nhật thông tin thành công!');
+      else notify(true, errorUpdateUser);
+      dispatch({
+        type: 'USER_UPDATE_DETAILS_RESET',
+      });
+    }
+  }, [loadingUpdateUser]);
+
   const updateHandler = (e) => {
     e.preventDefault();
     dispatch(updateUserDetails({ hoten, diachi, sodienthoai, email }));
@@ -35,6 +52,10 @@ const ProfileScreen = ({ history }) => {
   return (
     <>
       <Row>
+        <Col md={9}>
+          <h3>Các đơn hàng đã đặt của bạn</h3>
+          <AllOrdersFromUser />
+        </Col>
         <Col md={3}>
           <Row>
             <h3>Thông tin tài khoản</h3>
@@ -94,7 +115,17 @@ const ProfileScreen = ({ history }) => {
                 e.preventDefault();
                 if (matkhau === userInfo.matkhau && matkhaumoi) {
                   dispatch(updateUserDetails({ matkhau: matkhaumoi }));
-                  setTimeout(() => window.location.reload(), 1000);
+                  setTimeout(() => window.location.reload(), 1500);
+                } else if (!matkhau) {
+                  dispatch({
+                    type: 'USER_UPDATE_DETAILS_FAIL',
+                    payload: 'Hãy điền mật khẩu hiện tại và mật khẩu mới!',
+                  });
+                } else {
+                  dispatch({
+                    type: 'USER_UPDATE_DETAILS_FAIL',
+                    payload: 'Sai mật khẩu hiện tại!',
+                  });
                 }
               }}
             >
@@ -126,10 +157,6 @@ const ProfileScreen = ({ history }) => {
               </Button>
             </Form>
           </Row>
-        </Col>
-        <Col md={9}>
-          <h3>Các đơn hàng</h3>
-          <AllOrdersFromUser />
         </Col>
       </Row>
     </>

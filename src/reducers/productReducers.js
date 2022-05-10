@@ -5,25 +5,42 @@ import {
   PRODUCT_DETAILS_FAIL,
   PRODUCT_DETAILS_REQUEST,
   PRODUCT_DETAILS_SUCCESS,
-  PRODUCT_UPDATEDETAIL_REQUEST,
-  PRODUCT_UPDATEDELETE_FAIL,
-  PRODUCT_UPDATEDELETE_REQUEST,
-  PRODUCT_UPDATEDELETE_SUCCESS,
-  PRODUCT_UPDATEDETAIL_FAIL,
-  PRODUCT_UPDATEDETAIL_SUCCESS,
-  PRODUCT_UPDATECREATE_FAIL,
-  PRODUCT_UPDATECREATE_REQUEST,
-  PRODUCT_UPDATECREATE_SUCCESS,
-  PRODUCT_UPDATE_RESET,
+  ADMIN_UPDATE_PRODUCT_REQUEST,
+  ADMIN_DELETE_PRODUCT_FAIL,
+  ADMIN_DELETE_PRODUCT_REQUEST,
+  ADMIN_DELETE_PRODUCT_SUCCESS,
+  ADMIN_DELETE_PRODUCT_RESET,
+  ADMIN_UPDATE_PRODUCT_FAIL,
+  ADMIN_UPDATE_PRODUCT_SUCCESS,
+  ADMIN_UPDATE_PRODUCT_RESET,
+  ADMIN_POST_PRODUCT_FAIL,
+  ADMIN_POST_PRODUCT_RESET,
+  ADMIN_POST_PRODUCT_REQUEST,
+  ADMIN_POST_PRODUCT_SUCCESS,
   GET_PRODUCT_AUTHORS_FAIL,
+  GET_PRODUCT_AUTHORS_RESET,
   GET_PRODUCT_AUTHORS_REQUEST,
   GET_PRODUCT_AUTHORS_SUCCESS,
   GET_PRODUCT_PUBLISHERS_FAIL,
+  GET_PRODUCT_PUBLISHERS_RESET,
   GET_PRODUCT_PUBLISHERS_REQUEST,
   GET_PRODUCT_PUBLISHERS_SUCCESS,
   GET_PRODUCT_CATEGORIES_FAIL,
+  GET_PRODUCT_CATEGORIES_RESET,
   GET_PRODUCT_CATEGORIES_REQUEST,
   GET_PRODUCT_CATEGORIES_SUCCESS,
+  POST_PRODUCT_AUTHORS_FAIL,
+  POST_PRODUCT_AUTHORS_RESET,
+  POST_PRODUCT_AUTHORS_REQUEST,
+  POST_PRODUCT_AUTHORS_SUCCESS,
+  POST_PRODUCT_PUBLISHERS_FAIL,
+  POST_PRODUCT_PUBLISHERS_RESET,
+  POST_PRODUCT_PUBLISHERS_REQUEST,
+  POST_PRODUCT_PUBLISHERS_SUCCESS,
+  POST_PRODUCT_CATEGORIES_FAIL,
+  POST_PRODUCT_CATEGORIES_RESET,
+  POST_PRODUCT_CATEGORIES_REQUEST,
+  POST_PRODUCT_CATEGORIES_SUCCESS,
 } from './../constants/productConstants';
 
 export const productListReducer = (state = { products: [] }, action) => {
@@ -52,40 +69,50 @@ export const productDetailsReducer = (state = { product: null }, action) => {
   }
 };
 
-export const adminUpdateProductReducer = (
-  state = { successCreate: false, successDetail: false, successDelete: false },
-  action
-) => {
+export const adminUpdateProductReducer = (state = {}, action) => {
   switch (action.type) {
-    case PRODUCT_UPDATEDETAIL_REQUEST:
+    case ADMIN_UPDATE_PRODUCT_REQUEST:
       return { loading: true };
-    case PRODUCT_UPDATEDETAIL_SUCCESS:
-      return { loading: false, successDetail: true };
-    case PRODUCT_UPDATEDETAIL_FAIL:
+    case ADMIN_UPDATE_PRODUCT_SUCCESS:
+      return { loading: false, success: true };
+    case ADMIN_UPDATE_PRODUCT_FAIL:
       return { loading: false, error: action.payload };
-    case PRODUCT_UPDATEDELETE_REQUEST:
-      return { loading: true };
-    case PRODUCT_UPDATEDELETE_SUCCESS:
-      return { loading: false, sucessDelete: true };
-    case PRODUCT_UPDATEDELETE_FAIL:
-      return { loading: false, error: action.payload };
-    case PRODUCT_UPDATECREATE_REQUEST:
-      return { loading: true };
-    case PRODUCT_UPDATECREATE_SUCCESS:
-      return { loading: false, sucessCreate: true };
-    case PRODUCT_UPDATECREATE_FAIL:
-      return { loading: false, error: action.payload };
-    case PRODUCT_UPDATE_RESET:
-      return {
-        successCreate: false,
-        successDetail: false,
-        successDelete: false,
-      };
+    case ADMIN_UPDATE_PRODUCT_RESET:
+      return {};
     default:
       return state;
   }
 };
-export const getAuthorsReducer = (state = { loading: false }, action) => {
+export const adminPostProductReducer = (state = {}, action) => {
+  switch (action.type) {
+    case ADMIN_POST_PRODUCT_REQUEST:
+      return { loading: true };
+    case ADMIN_POST_PRODUCT_SUCCESS:
+      return { loading: false, success: true };
+    case ADMIN_POST_PRODUCT_FAIL:
+      return { loading: false, error: action.payload };
+    case ADMIN_POST_PRODUCT_RESET:
+      return {};
+    default:
+      return state;
+  }
+};
+export const adminDeleteProductReducer = (state = {}, action) => {
+  switch (action.type) {
+    case ADMIN_DELETE_PRODUCT_REQUEST:
+      return { loading: true };
+    case ADMIN_DELETE_PRODUCT_SUCCESS:
+      return { loading: false, success: true };
+    case ADMIN_DELETE_PRODUCT_FAIL:
+      return { loading: false, error: action.payload };
+    case ADMIN_DELETE_PRODUCT_RESET:
+      return {};
+    default:
+      return state;
+  }
+};
+
+export const getAuthorsReducer = (state = {}, action) => {
   switch (action.type) {
     case GET_PRODUCT_AUTHORS_REQUEST:
       return { loading: true };
@@ -93,11 +120,29 @@ export const getAuthorsReducer = (state = { loading: false }, action) => {
       return { loading: false, authors: action.payload };
     case GET_PRODUCT_AUTHORS_FAIL:
       return { loading: false, error: action.payload };
+    case GET_PRODUCT_AUTHORS_RESET:
+      return {};
     default:
       return state;
   }
 };
-export const getPublishersReducer = (state = { loading: false }, action) => {
+
+export const postAuthorsReducer = (state = {}, action) => {
+  switch (action.type) {
+    case POST_PRODUCT_AUTHORS_REQUEST:
+      return { loading: true };
+    case POST_PRODUCT_AUTHORS_SUCCESS:
+      return { loading: false, author: action.payload, success: true };
+    case POST_PRODUCT_AUTHORS_FAIL:
+      return { loading: false, error: action.payload };
+    case POST_PRODUCT_AUTHORS_RESET:
+      return {};
+    default:
+      return state;
+  }
+};
+
+export const getPublishersReducer = (state = {}, action) => {
   switch (action.type) {
     case GET_PRODUCT_PUBLISHERS_REQUEST:
       return { loading: true };
@@ -105,11 +150,29 @@ export const getPublishersReducer = (state = { loading: false }, action) => {
       return { loading: false, publishers: action.payload };
     case GET_PRODUCT_PUBLISHERS_FAIL:
       return { loading: false, error: action.payload };
+    case GET_PRODUCT_PUBLISHERS_RESET:
+      return {};
     default:
       return state;
   }
 };
-export const getCategoriesReducer = (state = { loading: false }, action) => {
+
+export const postPublishersReducer = (state = {}, action) => {
+  switch (action.type) {
+    case POST_PRODUCT_PUBLISHERS_REQUEST:
+      return { loading: true };
+    case POST_PRODUCT_PUBLISHERS_SUCCESS:
+      return { loading: false, publisher: action.payload, success: true };
+    case POST_PRODUCT_PUBLISHERS_FAIL:
+      return { loading: false, error: action.payload };
+    case POST_PRODUCT_PUBLISHERS_RESET:
+      return {};
+    default:
+      return state;
+  }
+};
+
+export const getCategoriesReducer = (state = {}, action) => {
   switch (action.type) {
     case GET_PRODUCT_CATEGORIES_REQUEST:
       return { loading: true };
@@ -117,6 +180,23 @@ export const getCategoriesReducer = (state = { loading: false }, action) => {
       return { loading: false, categories: action.payload };
     case GET_PRODUCT_CATEGORIES_FAIL:
       return { loading: false, error: action.payload };
+    case GET_PRODUCT_CATEGORIES_RESET:
+      return {};
+    default:
+      return state;
+  }
+};
+
+export const postCategoriesReducer = (state = {}, action) => {
+  switch (action.type) {
+    case POST_PRODUCT_CATEGORIES_REQUEST:
+      return { loading: true };
+    case POST_PRODUCT_CATEGORIES_SUCCESS:
+      return { loading: false, success: true, category: action.payload };
+    case POST_PRODUCT_CATEGORIES_FAIL:
+      return { loading: false, error: action.payload };
+    case POST_PRODUCT_CATEGORIES_RESET:
+      return {};
     default:
       return state;
   }

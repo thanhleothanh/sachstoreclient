@@ -15,12 +15,30 @@ import { listProductDetails } from './../actions/productActions';
 import Loader from './../components/Loader';
 import Message from './../components/Message';
 import { addCartItem } from '../actions/cartActions';
+import notify from '../utils/notify';
 
 const ProductScreen = ({ history, match }) => {
   const dispatch = useDispatch();
   const { loading, product, error } = useSelector(
     (state) => state.productDetails
   );
+
+  const {
+    loading: loadingPostCart,
+    success: successPostCart,
+    error: errorPostCart,
+  } = useSelector((state) => state.postCart);
+  useEffect(() => {
+    if (!loadingPostCart && (successPostCart || errorPostCart)) {
+      if (successPostCart)
+        notify(false, 'Thêm sản phẩm vào giỏ hàng thành công!');
+      else notify(true, errorPostCart);
+
+      dispatch({
+        type: 'CART_ADD_ITEM_RESET',
+      });
+    }
+  }, [loadingPostCart]);
 
   const [qty, setQty] = useState(1);
 
@@ -49,26 +67,12 @@ const ProductScreen = ({ history, match }) => {
           <>
             <Row>
               <Col md={6}>
-                <div className='d-flex flex-column'>
-                  <Image src={product.hinhanh} alt='product-image' fluid />
-                </div>
-              </Col>
-              <Col md={3}>
                 <ListGroup variant='flush'>
                   <ListGroupItem>
                     <h3>{product.tensach}</h3>
                   </ListGroupItem>
-                  <ListGroupItem>
-                    Giá bán:{' '}
-                    {product.giasach.toLocaleString('vi', {
-                      style: 'currency',
-                      currency: 'VND',
-                    })}
-                  </ListGroupItem>
                   <ListGroupItem>{product.mota}</ListGroupItem>
                 </ListGroup>
-              </Col>
-              <Col md={3}>
                 <Card>
                   <ListGroup variant='flush'>
                     <ListGroupItem>
@@ -117,7 +121,6 @@ const ProductScreen = ({ history, match }) => {
                     <ListGroupItem>
                       <Button
                         onClick={addToCartHandler}
-                        className='btn-block'
                         type='button'
                         disabled={product.soluong === 0}
                       >
@@ -126,6 +129,11 @@ const ProductScreen = ({ history, match }) => {
                     </ListGroupItem>
                   </ListGroup>
                 </Card>
+              </Col>
+              <Col md={6}>
+                <div className='d-flex flex-column'>
+                  <Image src={product.hinhanh} alt='product-image' fluid />
+                </div>
               </Col>
             </Row>
           </>

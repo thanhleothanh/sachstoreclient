@@ -21,32 +21,16 @@ const Header = () => {
             <Navbar.Brand>Sach Store</Navbar.Brand>
           </LinkContainer>
           <Navbar.Toggle aria-controls='basic-navbar-nav' />
-          <Navbar.Collapse id='basic-navbar-nav'>
-            <Nav className='me-auto'>
+          <Navbar.Collapse
+            style={{ justifyContent: 'end' }}
+            id='basic-navbar-nav'
+          >
+            <Nav>
               <LinkContainer to='/cart'>
                 <Nav.Link>
                   <i className='fas fa-shopping-cart'></i> Giỏ hàng
                 </Nav.Link>
               </LinkContainer>
-
-              {userInfo ? (
-                <>
-                  <NavDropdown title={userInfo.name} id='username'>
-                    <LinkContainer to='/profile'>
-                      <NavDropdown.Item>Thông tin tài khoản</NavDropdown.Item>
-                    </LinkContainer>
-                    <NavDropdown.Item onClick={logoutHandler}>
-                      Đăng xuất
-                    </NavDropdown.Item>
-                  </NavDropdown>
-                </>
-              ) : (
-                <LinkContainer to='/login'>
-                  <Nav.Link>
-                    <i className='fas fa-user'></i> Đăng nhập/Đăng ký
-                  </Nav.Link>
-                </LinkContainer>
-              )}
 
               {userInfo &&
                 (userInfo.vaitro === 'admin' ||
@@ -69,6 +53,27 @@ const Header = () => {
                     )}
                   </NavDropdown>
                 )}
+              {userInfo ? (
+                <>
+                  <NavDropdown
+                    title={'Xin chào ' + userInfo.hoten}
+                    id='username'
+                  >
+                    <LinkContainer to='/profile'>
+                      <NavDropdown.Item>Thông tin tài khoản</NavDropdown.Item>
+                    </LinkContainer>
+                    <NavDropdown.Item onClick={logoutHandler}>
+                      Đăng xuất
+                    </NavDropdown.Item>
+                  </NavDropdown>
+                </>
+              ) : (
+                <LinkContainer to='/login'>
+                  <Nav.Link>
+                    <i className='fas fa-user'></i> Đăng nhập/Đăng ký
+                  </Nav.Link>
+                </LinkContainer>
+              )}
             </Nav>
           </Navbar.Collapse>
         </Container>

@@ -50,6 +50,7 @@ export const addCartItem = (sachid, soluong) => async (dispatch, getState) => {
 
     dispatch({
       type: CART_ADD_ITEM_SUCCESS,
+      payload: data,
     });
   } catch (error) {
     dispatch({

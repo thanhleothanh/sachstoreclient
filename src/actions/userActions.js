@@ -18,13 +18,15 @@ import {
   ALL_USERS_DETAILS_FAIL,
   ALL_USERS_DETAILS_RESET,
   ALL_USERS_DETAILS_REQUEST,
-  USER_UPDATEDELETE_SUCCESS,
-  USER_UPDATEDELETE_FAIL,
-  USER_UPDATEDELETE_REQUEST,
-  USER_UPDATE_RESET,
   ADMIN_POST_USER_FAIL,
   ADMIN_POST_USER_REQUEST,
   ADMIN_POST_USER_SUCCESS,
+  ADMIN_DELETE_USER_FAIL,
+  ADMIN_DELETE_USER_REQUEST,
+  ADMIN_DELETE_USER_SUCCESS,
+  ADMIN_UPDATE_USER_FAIL,
+  ADMIN_UPDATE_USER_REQUEST,
+  ADMIN_UPDATE_USER_SUCCESS,
 } from '../constants/userConstants';
 import axios from 'axios';
 
@@ -76,9 +78,6 @@ export const logout = () => async (dispatch) => {
   });
   dispatch({
     type: ALL_USERS_DETAILS_RESET,
-  });
-  dispatch({
-    type: USER_UPDATE_RESET,
   });
   localStorage.removeItem('userInfo');
 };
@@ -160,20 +159,20 @@ export const getAllUsersDetails = () => async (dispatch, getState) => {
   }
 };
 
-export const updateDeleteUser = (userId) => async (dispatch) => {
+export const adminDeleteUser = (userId) => async (dispatch) => {
   try {
     dispatch({
-      type: USER_UPDATEDELETE_REQUEST,
+      type: ADMIN_DELETE_USER_REQUEST,
     });
 
     await axios.delete(`/api/users/${userId}`);
 
     dispatch({
-      type: USER_UPDATEDELETE_SUCCESS,
+      type: ADMIN_DELETE_USER_SUCCESS,
     });
   } catch (error) {
     dispatch({
-      type: USER_UPDATEDELETE_FAIL,
+      type: ADMIN_DELETE_USER_FAIL,
       payload: error.response ? error.response.data : "There's a problem",
     });
   }
@@ -189,6 +188,21 @@ export const adminPostUser = (newUser) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: ADMIN_POST_USER_FAIL,
+      payload: error.response ? error.response.data : "There's a problem",
+    });
+  }
+};
+
+export const adminUpdateUser = (userId, newUser) => async (dispatch) => {
+  try {
+    dispatch({ type: ADMIN_UPDATE_USER_REQUEST });
+
+    await axios.patch(`/api/users/${userId}`, newUser);
+
+    dispatch({ type: ADMIN_UPDATE_USER_SUCCESS });
+  } catch (error) {
+    dispatch({
+      type: ADMIN_UPDATE_USER_FAIL,
       payload: error.response ? error.response.data : "There's a problem",
     });
   }

@@ -25,6 +25,7 @@ import {
   getProductCategories,
   getProductPublishers,
 } from './../actions/productActions';
+import notify from '../utils/notify';
 
 const ADMINProducts = ({ history }) => {
   const dispatch = useDispatch();
@@ -49,27 +50,31 @@ const ADMINProducts = ({ history }) => {
   } = useSelector((state) => state.getCategories);
 
   //modal
-  const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const [showUpdate, setShowUpdate] = useState(false);
+  const handleClose = () => setShowUpdate(false);
+  const handleShow = () => setShowUpdate(true);
   const [showCreate, setShowCreate] = useState(false);
-  const handleCloseCreate = () => setShowCreate(false);
+  const handleCloseCreate = () => {
+    setShowCreate(false);
+    setValidatedCreate(false);
+  };
   const handleShowCreate = () => setShowCreate(true);
 
   //update details
   const [productId, setProductId] = useState('');
-  const [name, setName] = useState('');
-  const [stock, setStock] = useState('');
-  const [price, setPrice] = useState('');
+  const [nameUpdate, setNameUpdate] = useState('');
+  const [stockUpdate, setStockUpdate] = useState('');
+  const [priceUpdate, setPriceUpdate] = useState('');
 
+  //create new sach
+  const [validatedCreate, setValidatedCreate] = useState(false);
   const [tensach, setTensach] = useState('');
   const [hinhanh, setHinhanh] = useState('');
   const [soluong, setSoluong] = useState('');
   const [giasach, setGiasach] = useState('');
-  const [tacgia, setTacgia] = useState(1);
-  const [nhaxuatban, setNhaxuatban] = useState(1);
-  const [theloai, setTheloai] = useState(1);
-
+  const [tacgia, setTacgia] = useState(null);
+  const [nhaxuatban, setNhaxuatban] = useState(null);
+  const [theloai, setTheloai] = useState(null);
   //tacgia nhaxuatban theloai
   const [tacgiaCreate, setTacgiaCreate] = useState('');
   const [nhaxuatbanCreate, setNhaxuatbanCreate] = useState('');
@@ -87,23 +92,140 @@ const ADMINProducts = ({ history }) => {
     dispatch(getProductCategories());
   }, [userInfo]);
 
+  //toastify
+  //toastify
+  //toastify
+
+  const {
+    loading: loadinAdminUpdateProduct,
+    success: successAdminUpdateProduct,
+    error: errorAdminUpdateProduct,
+  } = useSelector((state) => state.adminUpdateProduct);
+  useEffect(() => {
+    if (
+      !loadinAdminUpdateProduct &&
+      (successAdminUpdateProduct || errorAdminUpdateProduct)
+    ) {
+      if (successAdminUpdateProduct)
+        notify(false, 'Cập nhật sản phẩm thành công!');
+      else notify(true, errorAdminUpdateProduct);
+      dispatch({
+        type: 'ADMIN_UPDATE_PRODUCT_RESET',
+      });
+    }
+  }, [loadinAdminUpdateProduct]);
+
+  const {
+    loading: loadinAdminDeleteProduct,
+    success: successAdminDeleteProduct,
+    error: errorAdminDeleteProduct,
+  } = useSelector((state) => state.adminDeleteProduct);
+  useEffect(() => {
+    if (
+      !loadinAdminDeleteProduct &&
+      (successAdminDeleteProduct || errorAdminDeleteProduct)
+    ) {
+      if (successAdminDeleteProduct) notify(false, 'Xoá sản phẩm thành công!');
+      else notify(true, errorAdminDeleteProduct);
+      dispatch({
+        type: 'ADMIN_DELETE_PRODUCT_RESET',
+      });
+    }
+  }, [loadinAdminDeleteProduct]);
+
+  const {
+    loading: loadinAdminPostProduct,
+    success: successAdminPostProduct,
+    error: errorAdminPostProduct,
+  } = useSelector((state) => state.adminPostProduct);
+  useEffect(() => {
+    if (
+      !loadinAdminPostProduct &&
+      (successAdminPostProduct || errorAdminPostProduct)
+    ) {
+      if (successAdminPostProduct) notify(false, 'Thêm sản phẩm thành công!');
+      else notify(true, errorAdminPostProduct);
+      dispatch({
+        type: 'ADMIN_POST_PRODUCT_RESET',
+      });
+    }
+  }, [loadinAdminPostProduct]);
+
+  const {
+    loading: loadinPostCategories,
+    success: successPostCategories,
+    error: errorPostCategories,
+  } = useSelector((state) => state.postCategories);
+  useEffect(() => {
+    if (
+      !loadinPostCategories &&
+      (successPostCategories || errorPostCategories)
+    ) {
+      if (successPostCategories)
+        notify(false, 'Thêm thể loại sách thành công!');
+      else notify(true, errorPostCategories);
+      dispatch({
+        type: 'POST_PRODUCT_CATEGORIES_RESET',
+      });
+    }
+  }, [loadinPostCategories]);
+
+  const {
+    loading: loadinPostPublishers,
+    success: successPostPublishers,
+    error: errorPostPublishers,
+  } = useSelector((state) => state.postPublishers);
+  useEffect(() => {
+    if (
+      !loadinPostPublishers &&
+      (successPostPublishers || errorPostPublishers)
+    ) {
+      if (successPostPublishers)
+        notify(false, 'Thêm nhà xuất bản mới thành công!');
+      else notify(true, errorPostPublishers);
+      dispatch({
+        type: 'POST_PRODUCT_PUBLISHERS_RESET',
+      });
+    }
+  }, [loadinPostPublishers]);
+
+  const {
+    loading: loadinPostAuthors,
+    success: successPostAuthors,
+    error: errorPostAuthors,
+  } = useSelector((state) => state.postAuthors);
+  useEffect(() => {
+    if (!loadinPostAuthors && (successPostAuthors || errorPostAuthors)) {
+      if (successPostAuthors) notify(false, 'Thêm tác giả mới thành công!');
+      else notify(true, errorPostAuthors);
+      dispatch({
+        type: 'POST_PRODUCT_AUTHORS_RESET',
+      });
+    }
+  }, [loadinPostAuthors]);
+
+  //toastify
+  //toastify
+  //toastify
+
   /////// UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE
   const updateHandler = (productId) => {
     const product = products.find((e) => e.id === productId);
-    setName(product.tensach);
-    setStock(product.soluong);
-    setPrice(product.giasach);
+    setNameUpdate(product.tensach);
+    setStockUpdate(product.soluong);
+    setPriceUpdate(product.giasach);
     setProductId(productId);
 
     handleShow();
   };
   const actualUpdateHandler = (e) => {
     e.preventDefault();
+    console.log(stockUpdate);
     dispatch(
       adminUpdateProduct(productId, {
-        tensach: name,
-        soluong: stock === '0' ? 0 : stock * 1,
-        giasach: price * 1,
+        tensach: nameUpdate,
+        soluong: stockUpdate === '0' ? 0 : stockUpdate * 1,
+        giasach: priceUpdate * 1,
       })
     );
     setTimeout(() => {
@@ -112,6 +234,7 @@ const ADMINProducts = ({ history }) => {
 
     handleClose();
   };
+
   const deleteHandler = (productId) => {
     if (window.confirm('Bạn có chắc không?')) {
       dispatch(adminDeleteProduct(productId));
@@ -126,7 +249,7 @@ const ADMINProducts = ({ history }) => {
     return (
       <>
         <Modal
-          show={show}
+          show={showUpdate}
           onHide={handleClose}
           backdrop='static'
           keyboard={false}
@@ -136,14 +259,14 @@ const ADMINProducts = ({ history }) => {
             <Modal.Title>Cập nhật sản phẩm {productId}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <Form>
+            <Form onSubmit={actualUpdateHandler}>
               <Form.Group controlId='name'>
                 <Form.Label>Tên sách</Form.Label>
                 <Form.Control
                   type='text'
                   placeholder='Nhập name'
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={nameUpdate}
+                  onChange={(e) => setNameUpdate(e.target.value)}
                   autoComplete='off'
                 ></Form.Control>
               </Form.Group>
@@ -152,8 +275,8 @@ const ADMINProducts = ({ history }) => {
                 <Form.Control
                   type='text'
                   placeholder='Nhập new stock'
-                  value={stock}
-                  onChange={(e) => setStock(e.target.value)}
+                  value={stockUpdate}
+                  onChange={(e) => setStockUpdate(e.target.value)}
                   autoComplete='off'
                 ></Form.Control>
               </Form.Group>
@@ -162,24 +285,19 @@ const ADMINProducts = ({ history }) => {
                 <Form.Control
                   type='text'
                   placeholder='Nhập price'
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
+                  value={priceUpdate}
+                  onChange={(e) => setPriceUpdate(e.target.value)}
                   autoComplete='off'
                 ></Form.Control>
               </Form.Group>
-              <Button
-                variant='dark'
-                className='mt-3'
-                type='submit'
-                onClick={(e) => actualUpdateHandler(e)}
-              >
+              <Button variant='dark' className='mt-3' type='submit'>
                 Cập nhật
               </Button>
             </Form>
           </Modal.Body>
           <Modal.Footer>
             <Button variant='secondary' onClick={() => handleClose()}>
-              Close
+              Đóng
             </Button>
           </Modal.Footer>
         </Modal>
@@ -193,39 +311,32 @@ const ADMINProducts = ({ history }) => {
   };
   const actualCreateHandler = (e) => {
     e.preventDefault();
-    console.log({
-      tensach: tensach,
-      soluong: parseInt(soluong),
-      giasach: parseFloat(giasach),
-      hinhanh: hinhanh,
-      api_nguoidung_id: parseInt(userInfo.id),
-      api_tacgia: parseInt(tacgia),
-      api_nhaxuatban: parseInt(nhaxuatban),
-      api_theloai: parseInt(theloai),
-    });
-    dispatch(
-      adminPostProduct({
-        tensach: tensach,
-        soluong: parseInt(soluong),
-        giasach: parseFloat(giasach),
-        hinhanh: hinhanh,
-        api_nguoidung_id: parseInt(userInfo.id),
-        api_tacgia: parseInt(tacgia),
-        api_nhaxuatban: parseInt(nhaxuatban),
-        api_theloai: parseInt(theloai),
-      })
-    );
-    setTensach('');
-    setSoluong('');
-    setGiasach('');
-    setHinhanh('');
-    setTacgia(1);
-    setNhaxuatban(1);
-    setTheloai(1);
-    setTimeout(() => {
-      dispatch(listProducts());
-    }, 500);
-    handleCloseCreate();
+    const form = e.currentTarget;
+    if (form.checkValidity() === true) {
+      dispatch(
+        adminPostProduct({
+          tensach: tensach,
+          soluong: parseInt(soluong),
+          giasach: parseFloat(giasach),
+          hinhanh: hinhanh,
+          api_nguoidung_id: parseInt(userInfo.id),
+          api_tacgia: parseInt(tacgia),
+          api_nhaxuatban: parseInt(nhaxuatban),
+          api_theloai: parseInt(theloai),
+        })
+      );
+      setTensach('');
+      setSoluong('');
+      setGiasach('');
+      setHinhanh('');
+      setTacgia(1);
+      setNhaxuatban(1);
+      setTheloai(1);
+      setTimeout(() => {
+        dispatch(listProducts());
+      }, 500);
+      handleCloseCreate();
+    } else setValidatedCreate(true);
   };
 
   //modal modal modal
@@ -254,16 +365,24 @@ const ADMINProducts = ({ history }) => {
               categories &&
               publishers && (
                 <Modal.Body>
-                  <Form onSubmit={actualCreateHandler}>
+                  <Form
+                    noValidate
+                    validated={validatedCreate}
+                    onSubmit={actualCreateHandler}
+                  >
                     <Form.Group controlId='nameCreate'>
                       <Form.Label>Tên sách</Form.Label>
                       <Form.Control
                         type='text'
-                        placeholder='Name'
+                        placeholder='Tên sách'
+                        required
                         autoComplete='off'
                         value={tensach}
                         onChange={(e) => setTensach(e.target.value)}
                       ></Form.Control>
+                      <Form.Control.Feedback type='invalid'>
+                        Không được để trống!
+                      </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group controlId='imgCreate'>
                       <Form.Label>Hình ảnh</Form.Label>
@@ -271,41 +390,53 @@ const ADMINProducts = ({ history }) => {
                         type='text'
                         placeholder='Hình ảnh'
                         autoComplete='off'
+                        required
                         value={hinhanh}
                         onChange={(e) => setHinhanh(e.target.value)}
                       ></Form.Control>
+                      <Form.Control.Feedback type='invalid'>
+                        Không được để trống!
+                      </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group controlId='stockCreate'>
                       <Form.Label>Số lượng</Form.Label>
                       <Form.Control
                         type='text'
                         placeholder='Số lượng stock'
+                        required
                         autoComplete='off'
                         value={soluong}
                         onChange={(e) => setSoluong(e.target.value)}
                       ></Form.Control>
+                      <Form.Control.Feedback type='invalid'>
+                        Không được để trống!
+                      </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group controlId='priceCreate'>
                       <Form.Label>Giá sách</Form.Label>
                       <Form.Control
                         type='text'
                         placeholder='Giá sách'
+                        required
                         autoComplete='off'
                         value={giasach}
                         onChange={(e) => setGiasach(e.target.value)}
                       ></Form.Control>
+                      <Form.Control.Feedback type='invalid'>
+                        Không được để trống!
+                      </Form.Control.Feedback>
                     </Form.Group>
                     <Row>
                       <Col md={6}>
                         <Form.Group controlId='authorChoose'>
-                          <Form.Label>Chọn tác giả</Form.Label>
+                          <Form.Label className='mt-2'>Chọn tác giả</Form.Label>
                           <Form.Control
                             as='select'
                             onChange={(e) => {
                               setTacgia(e.target.value);
                             }}
                           >
-                            <option>--Chọn--</option>
+                            <option value={null}>--Chọn--</option>
                             {!loadingAuthors &&
                               !errorAuthors &&
                               authors &&
@@ -315,37 +446,48 @@ const ADMINProducts = ({ history }) => {
                                 </option>
                               ))}
                           </Form.Control>
+                          <Form.Control.Feedback type='valid'>
+                            Có thể để trống
+                          </Form.Control.Feedback>
                         </Form.Group>
                       </Col>
                       <Col md={6}>
-                        <Form.Group controlId='authorCreate'>
-                          <Form.Label>Thêm tác giả</Form.Label>
-                          <Button
-                            className=''
-                            variant='primary'
-                            onClick={(e) => postAuthorHandler(e)}
-                          >
-                            <i className='fas fa-plus ml-5' />
-                          </Button>
-                          <Form.Control
-                            type='text'
-                            placeholder='Thêm tác giả'
-                            autoComplete='off'
-                            value={tacgiaCreate}
-                            onChange={(e) => setTacgiaCreate(e.target.value)}
-                          ></Form.Control>
-                        </Form.Group>
+                        <Form noValidate>
+                          <Form.Group controlId='authorCreate'>
+                            <Button
+                              className='mt-1'
+                              variant='secondary'
+                              onClick={(e) => postAuthorHandler(e)}
+                            >
+                              <i className='fas fa-plus pe-3' /> Thêm tác giả
+                            </Button>
+                            <Form.Control
+                              type='text'
+                              placeholder='Thêm tác giả'
+                              autoComplete='off'
+                              value={tacgiaCreate}
+                              onChange={(e) => setTacgiaCreate(e.target.value)}
+                            ></Form.Control>
+                            <Form.Control.Feedback type='valid'>
+                              Điền vào chỗ trống nếu muốn thêm mới, rồi bấm Thêm
+                              tác giả
+                            </Form.Control.Feedback>
+                          </Form.Group>
+                        </Form>
                       </Col>
                     </Row>
                     <Row>
                       <Col md={6}>
                         <Form.Group controlId='publisherChoose'>
-                          <Form.Label>Chọn nhà xuất bản</Form.Label>
+                          <Form.Label className='mt-2'>
+                            Chọn nhà xuất bản
+                          </Form.Label>
                           <Form.Control
                             as='select'
+                            required
                             onChange={(e) => setNhaxuatban(e.target.value)}
                           >
-                            <option>--Chọn--</option>
+                            <option value={null}>--Chọn--</option>
                             {!loadingPublishers &&
                               !errorPublishers &&
                               publishers &&
@@ -355,17 +497,19 @@ const ADMINProducts = ({ history }) => {
                                 </option>
                               ))}
                           </Form.Control>
+                          <Form.Control.Feedback type='valid'>
+                            Có thể để trống
+                          </Form.Control.Feedback>
                         </Form.Group>
                       </Col>
                       <Col md={6}>
                         <Form.Group controlId='publisherCreate'>
-                          <Form.Label>Thêm nhà xuất bản</Form.Label>
                           <Button
-                            className=''
-                            variant='primary'
+                            className='mt-1'
+                            variant='secondary'
                             onClick={(e) => postPublisherHandler(e)}
                           >
-                            <i className='fas fa-plus ml-5' />
+                            <i className='fas fa-plus pe-3' /> Thêm nhà xuất bản
                           </Button>
                           <Form.Control
                             type='text'
@@ -376,18 +520,25 @@ const ADMINProducts = ({ history }) => {
                               setNhaxuatbanCreate(e.target.value)
                             }
                           ></Form.Control>
+                          <Form.Control.Feedback type='valid'>
+                            Điền vào chỗ trống nếu muốn thêm mới, rồi bấm Thêm
+                            nhà xuất bản
+                          </Form.Control.Feedback>
                         </Form.Group>
                       </Col>
                     </Row>
                     <Row>
                       <Col md={6}>
                         <Form.Group controlId='categoryChoose'>
-                          <Form.Label>Chọn thể loại</Form.Label>
+                          <Form.Label className='mt-2'>
+                            Chọn thể loại
+                          </Form.Label>
                           <Form.Control
                             as='select'
+                            required
                             onChange={(e) => setTheloai(e.target.value)}
                           >
-                            <option>--Chọn--</option>
+                            <option value={null}>--Chọn--</option>
                             {!loadingCategories &&
                               !errorCategories &&
                               categories &&
@@ -397,43 +548,46 @@ const ADMINProducts = ({ history }) => {
                                 </option>
                               ))}
                           </Form.Control>
+                          <Form.Control.Feedback type='valid'>
+                            Có thể để trống
+                          </Form.Control.Feedback>
                         </Form.Group>
                       </Col>
                       <Col md={6}>
-                        <Form.Group controlId='categoryCreate'>
-                          <Form.Label>Thêm thể loại</Form.Label>
+                        <Form.Group formNoValidate controlId='categoryCreate'>
                           <Button
-                            className=''
-                            variant='primary'
+                            className='mt-1'
+                            variant='secondary'
                             onClick={(e) => postCategoryHandler(e)}
                           >
-                            <i className='fas fa-plus ml-5' />
+                            <i className='fas fa-plus pe-3' /> Thêm thể loại
                           </Button>
                           <Form.Control
+                            formNoValidate
                             type='text'
                             placeholder='Thêm thể loại'
                             autoComplete='off'
                             value={theloaiCreate}
                             onChange={(e) => setTheloaiCreate(e.target.value)}
                           ></Form.Control>
+                          <Form.Control.Feedback type='valid'>
+                            Điền vào chỗ trống nếu muốn thêm mới, rồi bấm Thêm
+                            thể loại
+                          </Form.Control.Feedback>
                         </Form.Group>
                       </Col>
                     </Row>
-                    <Button
-                      variant='dark'
-                      className='mt-3'
-                      type='submit'
-                      onClick={(e) => actualCreateHandler(e)}
-                    >
+                    <Button variant='dark' className='mt-3' type='submit'>
                       Thêm sách
                     </Button>
                   </Form>
                 </Modal.Body>
               )}
           </div>
+
           <Modal.Footer>
             <Button variant='secondary' onClick={() => handleCloseCreate()}>
-              Close
+              Đóng
             </Button>
           </Modal.Footer>
         </Modal>
@@ -443,42 +597,44 @@ const ADMINProducts = ({ history }) => {
 
   const postAuthorHandler = (e) => {
     e.preventDefault();
-    if (tacgiaCreate)
+    if (tacgiaCreate !== '') {
       dispatch(
         postProductAuthor({
           tentacgia: tacgiaCreate,
         })
       );
-    setTimeout(() => {
-      dispatch(getProductAuthors());
-    }, 500);
+      setTimeout(() => {
+        dispatch(getProductAuthors());
+      }, 500);
+    }
     setTacgiaCreate('');
   };
   const postCategoryHandler = (e) => {
     e.preventDefault();
-    if (theloaiCreate)
+    if (theloaiCreate !== '') {
       dispatch(
         postProductCategory({
           tentheloai: theloaiCreate,
         })
       );
-
-    setTimeout(() => {
-      dispatch(getProductCategories());
-    }, 500);
+      setTimeout(() => {
+        dispatch(getProductCategories());
+      }, 500);
+    }
     setTheloaiCreate('');
   };
   const postPublisherHandler = (e) => {
     e.preventDefault();
-    if (nhaxuatbanCreate)
+    if (nhaxuatbanCreate !== '') {
       dispatch(
         postProductPublisher({
           tennhaxuatban: nhaxuatbanCreate,
         })
       );
-    setTimeout(() => {
-      dispatch(getProductPublishers());
-    }, 500);
+      setTimeout(() => {
+        dispatch(getProductPublishers());
+      }, 500);
+    }
     setNhaxuatbanCreate('');
   };
 

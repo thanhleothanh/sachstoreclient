@@ -8,9 +8,6 @@ import {
   GET_ORDER_DETAILS_SUCCESS,
   GET_ORDER_DETAILS_REQUEST,
   GET_ORDER_DETAILS_FAIL,
-  PAY_ORDER_SUCCESS,
-  PAY_ORDER_FAIL,
-  PAY_ORDER_REQUEST,
   GET_ALL_ORDERS_REQUEST,
   GET_ALL_ORDERS_SUCCESS,
   GET_ALL_ORDERS_FAIL,
@@ -20,8 +17,10 @@ import {
   ADMIN_UPDATE_ORDER_FAIL,
   ADMIN_GET_ALL_ORDERS_SUCCESS,
   ADMIN_GET_ALL_ORDERS_FAIL,
+  PAY_ORDER_FAIL,
+  PAY_ORDER_REQUEST,
+  PAY_ORDER_SUCCESS,
 } from './../constants/orderConstants';
-import { CART_LIST_ITEMS_RESET } from './../constants/cartConstants';
 import axios from 'axios';
 
 export const postOrder = (orderInfo) => async (dispatch, getState) => {
@@ -36,7 +35,7 @@ export const postOrder = (orderInfo) => async (dispatch, getState) => {
 
     await Promise.all(
       cartItems.map(async (item) => {
-        await axios.post(`/api/orders/${data.id}/items/`, {
+        await axios.post(`/api/orders/${data.id}/items`, {
           api_sach: Number(item.sachid),
           giaban: Number(item.giasach),
           soluong: Number(item.soluong),
@@ -53,8 +52,6 @@ export const postOrder = (orderInfo) => async (dispatch, getState) => {
     );
 
     dispatch({ type: POST_ORDER_SUCCESS, payload: data });
-    localStorage.removeItem('cart');
-    dispatch({ type: CART_LIST_ITEMS_RESET });
   } catch (error) {
     dispatch({
       type: POST_ORDER_FAIL,
@@ -93,36 +90,20 @@ export const getOrderDetails = (orderId) => async (dispatch, getState) => {
   }
 };
 
-// export const payOrder =
-//   (orderId, paymentResult) => async (dispatch, getState) => {
-//     try {
-//       dispatch({ type: PAY_ORDER_REQUEST });
+export const payOrder = (orderId) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: PAY_ORDER_REQUEST });
 
-//       const {
-//         userLogin: { userInfo },
-//       } = getState();
+    const { data } = await axios.post(`/api/orders/${orderId}/pay`);
 
-//       const config = {
-//         headers: {
-//           'Content-type': 'application/json',
-//           Authorization: `Bearer ${userInfo.token}`,
-//         },
-//       };
-
-//       const { data } = await axios.patch(
-//         `/api/orders/${orderId}/pay`,
-//         paymentResult,
-//         config
-//       );
-
-//       dispatch({ type: PAY_ORDER_SUCCESS, payload: data });
-//     } catch (error) {
-//       dispatch({
-//         type: PAY_ORDER_FAIL,
-//         payload: error.response ? error.response.data : "There's a problem",
-//       });
-//     }
-//   };
+    dispatch({ type: PAY_ORDER_SUCCESS, payload: data });
+  } catch (error) {
+    dispatch({
+      type: PAY_ORDER_FAIL,
+      payload: error.response ? error.response.data : "There's a problem",
+    });
+  }
+};
 
 export const getAllOrders = () => async (dispatch, getState) => {
   try {

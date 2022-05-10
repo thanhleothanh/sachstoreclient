@@ -1,9 +1,22 @@
 import React, { useEffect } from 'react';
-import { Row, Col, ListGroup, ListGroupItem, Image } from 'react-bootstrap';
+import {
+  Row,
+  Col,
+  ListGroup,
+  ListGroupItem,
+  Image,
+  Button,
+} from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { getOrder, getOrderDetails } from './../actions/orderActions';
+import {
+  getAllOrders,
+  getOrder,
+  getOrderDetails,
+  payOrder,
+} from './../actions/orderActions';
 import Loader from './../components/Loader';
 import Message from './../components/Message';
+import notify from '../utils/notify';
 
 const OrderScreen = ({ history, match }) => {
   const dispatch = useDispatch();
@@ -22,8 +35,37 @@ const OrderScreen = ({ history, match }) => {
     } else {
       dispatch(getOrder(orderId));
       dispatch(getOrderDetails(orderId));
+      setTimeout(() => {
+        dispatch({ type: 'CART_DELETE_ITEM_RESET' });
+      }, 500);
     }
   }, [userInfo]);
+
+  const {
+    loading: loadingPayOrder,
+    success: successPayOrder,
+    error: errorPayOrder,
+  } = useSelector((state) => state.payOrder);
+  useEffect(() => {
+    if (!loadingPayOrder && (successPayOrder || errorPayOrder)) {
+      if (successPayOrder) notify(false, 'Thanh toán đơn hàng thành công!');
+      else notify(true, errorPayOrder);
+      dispatch({
+        type: 'PAY_ORDER_RESET',
+      });
+    }
+  }, [loadingPayOrder]);
+
+  const payOrderHandler = () => {
+    if (window.confirm('Bạn có xác nhận muốn thanh toán đơn hàng này!')) {
+      dispatch(payOrder(orderId));
+      setTimeout(() => {
+        dispatch(getOrder(orderId));
+        dispatch(getOrderDetails(orderId));
+        dispatch(getAllOrders());
+      }, 500);
+    }
+  };
 
   return (
     <>
@@ -42,28 +84,46 @@ const OrderScreen = ({ history, match }) => {
                 <ListGroup className='mt-3'>
                   <ListGroupItem>
                     <h4>Thông tin khách hàng</h4>
-                    <p className='mt-3'>Họ tên: {order.donhanghoten}</p>
-                    <p>Email: {order.donhangemail || 'N/A'}</p>
-                    <p>Địa chỉ: {order.donhangdiachi}</p>
+                    <Row className='mt-3 align-items-center'>
+                      <Col>Họ tên: </Col>
+                      <Col>{order.donhanghoten}</Col>
+                    </Row>
+                    <Row className='mt-3 align-items-center'>
+                      <Col>Email: </Col>
+                      <Col>{order.khachhangemail || 'N/A'}</Col>
+                    </Row>
+                    <Row className='mt-3 align-items-center'>
+                      <Col>Địa chỉ: </Col>
+                      <Col>{order.donhangdiachi}</Col>
+                    </Row>
+                    <Row className='mt-3 align-items-center'>
+                      <Col>Số điện thoại: </Col>
+                      <Col>{order.donhangsodienthoai}</Col>
+                    </Row>
                     {!order.donhangishoanthanh ? (
                       <Message>Đơn hàng này chưa được hoàn thành</Message>
                     ) : (
                       <Message variant='success'>
-                        Đơn hàng đã hoàn thành
+                        Đơn hàng đã hoàn thành và được shipped tới bạn!
                       </Message>
                     )}
                   </ListGroupItem>
                   <ListGroupItem>
                     <h4>Phương thức thanh toán</h4>
                     {!order.donhangisthanhtoan || !order.thoigianthanhtoan ? (
-                      <Message variant='danger'>
-                        Đơn hàng chưa được thanh toán!
-                      </Message>
+                      <div>
+                        <Message variant='danger'>
+                          Đơn hàng chưa được thanh toán!
+                        </Message>
+                        <Button onClick={payOrderHandler}>
+                          Thanh toán (giả lập quá trình thanh toán)
+                        </Button>
+                      </div>
                     ) : (
                       <Message variant='success'>
-                        Paid on:{' '}
+                        Đã thanh toán vào :{' '}
                         {order.thoigianthanhtoan
-                          ? order.thoigianthanhtoan.substring(0, 10)
+                          ? order.thoigianthanhtoan
                           : 'Đơn hàng chưa được thanh toán!'}
                       </Message>
                     )}

@@ -11,16 +11,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { adminGetAllOrders, adminUpdateOrder } from './../actions/orderActions';
 import Message from './../components/Message';
 import Loader from '../components/Loader';
+import notify from '../utils/notify';
 
 const ADMINOrders = ({ history }) => {
   const dispatch = useDispatch();
 
   const { userInfo } = useSelector((state) => state.userLogin);
-  const {
-    loading: loadingUpdate,
-    error: errorUpdate,
-    success: successUpdate,
-  } = useSelector((state) => state.adminUpdateOrder);
   const { adminAllOrders, loading, error } = useSelector(
     (state) => state.adminAllOrders
   );
@@ -35,6 +31,21 @@ const ADMINOrders = ({ history }) => {
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [ishoanthanh, setIshoanthanh] = useState(false);
+
+  const {
+    loading: loadingUpdate,
+    error: errorUpdate,
+    success: successUpdate,
+  } = useSelector((state) => state.adminUpdateOrder);
+  useEffect(() => {
+    if (!loadingUpdate && (successUpdate || errorUpdate)) {
+      if (successUpdate) notify(false, 'Cập nhật đơn hàng thành công!');
+      else notify(true, errorUpdate);
+      dispatch({
+        type: 'ADMIN_UPDATE_ORDER_RESET',
+      });
+    }
+  }, [loadingUpdate]);
 
   useEffect(() => {
     if (!userInfo) {
@@ -59,13 +70,15 @@ const ADMINOrders = ({ history }) => {
   };
   const actualUpdateHandler = (e) => {
     e.preventDefault();
-    dispatch(
-      adminUpdateOrder(orderId, {
-        diachi: address,
-        sodienthoai: phone,
-        isHoanthanh: ishoanthanh,
-      })
-    );
+    setTimeout(() => {
+      dispatch(
+        adminUpdateOrder(orderId, {
+          diachi: address,
+          sodienthoai: phone,
+          isHoanthanh: ishoanthanh,
+        })
+      );
+    }, 500);
     handleClose();
   };
 
@@ -107,19 +120,16 @@ const ADMINOrders = ({ history }) => {
               <Form.Group className='mt-3' controlId='ishoanthanh'>
                 <Form.Label>Đã hoàn thành</Form.Label>
                 <span>
-                  <Button variant='info' className='mx-3'>
-                    <i
-                      className={` mx-3 ${
-                        ishoanthanh
-                          ? 'fas fa-check-circle'
-                          : 'fas fa-times-circle'
-                      }`}
-                      onClick={() => {
-                        setIshoanthanh(!ishoanthanh);
-                        console.log(ishoanthanh);
-                      }}
-                    />
-                  </Button>
+                  <i
+                    className={` fa-2x mx-3 ${
+                      ishoanthanh
+                        ? 'fas fa-check-circle'
+                        : 'fas fa-times-circle'
+                    }`}
+                    onClick={() => {
+                      setIshoanthanh(!ishoanthanh);
+                    }}
+                  />
                 </span>
               </Form.Group>
 
@@ -186,15 +196,15 @@ const ADMINOrders = ({ history }) => {
                   <td>
                     <i
                       className={
-                        order.donhangisthanhtoan && order.thongtinthanhtoan
+                        order.donhangisthanhtoan && order.thoigianthanhtoan
                           ? 'fas fa-check fa-lg'
                           : 'fas fa-times fa-lg'
                       }
                     />{' '}
                     {!order.donhangisthanhtoan ? (
                       ''
-                    ) : order.thongtinthanhtoan ? (
-                      'on ' + order.thongtinthanhtoan.substring(0, 10)
+                    ) : order.thoigianthanhtoan ? (
+                      ': ' + order.thoigianthanhtoan.substring(0, 10)
                     ) : (
                       <i className='fas fa-question-circle' />
                     )}

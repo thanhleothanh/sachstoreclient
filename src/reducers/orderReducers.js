@@ -1,7 +1,12 @@
 import {
+  PAY_ORDER_FAIL,
+  PAY_ORDER_REQUEST,
+  PAY_ORDER_RESET,
+  PAY_ORDER_SUCCESS,
   POST_ORDER_FAIL,
   POST_ORDER_REQUEST,
   POST_ORDER_SUCCESS,
+  POST_ORDER_RESET,
   GET_ORDER_FAIL,
   GET_ORDER_SUCCESS,
   GET_ORDER_REQUEST,
@@ -19,6 +24,7 @@ import {
   ADMIN_UPDATE_ORDER_FAIL,
   ADMIN_UPDATE_ORDER_REQUEST,
   ADMIN_UPDATE_ORDER_SUCCESS,
+  ADMIN_UPDATE_ORDER_RESET,
 } from './../constants/orderConstants';
 
 export const orderReducers = (state = { loading: false }, action) => {
@@ -65,9 +71,12 @@ export const postOrderReducers = (state = { loading: false }, action) => {
       return {
         loading: false,
         order: action.payload,
+        success: true,
       };
     case POST_ORDER_FAIL:
       return { loading: false, error: action.payload };
+    case POST_ORDER_RESET:
+      return { loading: false };
     default:
       return state;
   }
@@ -109,6 +118,23 @@ export const adminUpdateOrderReducers = (state = {}, action) => {
       return { loading: false, success: true };
     case ADMIN_UPDATE_ORDER_FAIL:
       return { loading: false, error: action.payload };
+    case ADMIN_UPDATE_ORDER_RESET:
+      return {};
+    default:
+      return state;
+  }
+};
+
+export const payOrderReducer = (state = {}, action) => {
+  switch (action.type) {
+    case PAY_ORDER_REQUEST:
+      return { loading: true };
+    case PAY_ORDER_SUCCESS:
+      return { loading: false, success: true };
+    case PAY_ORDER_FAIL:
+      return { loading: false, error: action.payload };
+    case PAY_ORDER_RESET:
+      return {};
     default:
       return state;
   }

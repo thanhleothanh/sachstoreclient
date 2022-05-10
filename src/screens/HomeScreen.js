@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Col, Row } from 'react-bootstrap';
 import Product from './../components/Product';
@@ -11,7 +11,6 @@ const HomeScreen = () => {
   const { loading, error, products } = useSelector(
     (state) => state.productList
   );
-
   useEffect(() => {
     dispatch(listProducts());
     dispatch({ type: 'GET_ORDER_RESET' });

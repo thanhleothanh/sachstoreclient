@@ -5,15 +5,6 @@ import {
   PRODUCT_DETAILS_FAIL,
   PRODUCT_DETAILS_REQUEST,
   PRODUCT_DETAILS_SUCCESS,
-  PRODUCT_UPDATEDETAIL_REQUEST,
-  PRODUCT_UPDATEDETAIL_SUCCESS,
-  PRODUCT_UPDATEDETAIL_FAIL,
-  PRODUCT_UPDATEDELETE_FAIL,
-  PRODUCT_UPDATEDELETE_REQUEST,
-  PRODUCT_UPDATEDELETE_SUCCESS,
-  PRODUCT_UPDATECREATE_SUCCESS,
-  PRODUCT_UPDATECREATE_REQUEST,
-  PRODUCT_UPDATECREATE_FAIL,
   GET_PRODUCT_AUTHORS_FAIL,
   GET_PRODUCT_AUTHORS_SUCCESS,
   GET_PRODUCT_AUTHORS_REQUEST,
@@ -23,6 +14,24 @@ import {
   GET_PRODUCT_PUBLISHERS_FAIL,
   GET_PRODUCT_PUBLISHERS_SUCCESS,
   GET_PRODUCT_PUBLISHERS_REQUEST,
+  POST_PRODUCT_AUTHORS_FAIL,
+  POST_PRODUCT_AUTHORS_SUCCESS,
+  POST_PRODUCT_AUTHORS_REQUEST,
+  POST_PRODUCT_CATEGORIES_FAIL,
+  POST_PRODUCT_CATEGORIES_SUCCESS,
+  POST_PRODUCT_CATEGORIES_REQUEST,
+  POST_PRODUCT_PUBLISHERS_FAIL,
+  POST_PRODUCT_PUBLISHERS_SUCCESS,
+  POST_PRODUCT_PUBLISHERS_REQUEST,
+  ADMIN_UPDATE_PRODUCT_REQUEST,
+  ADMIN_UPDATE_PRODUCT_SUCCESS,
+  ADMIN_UPDATE_PRODUCT_FAIL,
+  ADMIN_DELETE_PRODUCT_FAIL,
+  ADMIN_DELETE_PRODUCT_REQUEST,
+  ADMIN_DELETE_PRODUCT_SUCCESS,
+  ADMIN_POST_PRODUCT_SUCCESS,
+  ADMIN_POST_PRODUCT_REQUEST,
+  ADMIN_POST_PRODUCT_FAIL,
 } from './../constants/productConstants';
 import axios from 'axios';
 
@@ -97,30 +106,43 @@ export const getProductCategories = () => async (dispatch) => {
   }
 };
 
-export const postProductAuthor = (newAuthor) => async () => {
+export const postProductAuthor = (newAuthor) => async (dispatch) => {
   try {
+    dispatch({ type: POST_PRODUCT_AUTHORS_REQUEST });
+
     const { data } = await axios.post(`/api/books/authors`, newAuthor);
-    console.log(data);
+    dispatch({ type: POST_PRODUCT_AUTHORS_SUCCESS, payload: data });
   } catch (error) {
-    console.log(error);
+    dispatch({
+      type: POST_PRODUCT_AUTHORS_FAIL,
+      payload: error.response ? error.response.data : "There's a problem",
+    });
   }
 };
 
-export const postProductPublisher = (newPublisher) => async () => {
+export const postProductPublisher = (newPublisher) => async (dispatch) => {
   try {
+    dispatch({ type: POST_PRODUCT_PUBLISHERS_REQUEST });
     const { data } = await axios.post(`/api/books/publishers`, newPublisher);
-    console.log(data);
+    dispatch({ type: POST_PRODUCT_PUBLISHERS_SUCCESS, payload: data });
   } catch (error) {
-    console.log(error);
+    dispatch({
+      type: POST_PRODUCT_PUBLISHERS_FAIL,
+      payload: error.response ? error.response.data : "There's a problem",
+    });
   }
 };
 
-export const postProductCategory = (newCategory) => async () => {
+export const postProductCategory = (newCategory) => async (dispatch) => {
   try {
+    dispatch({ type: POST_PRODUCT_CATEGORIES_REQUEST });
     const { data } = await axios.post(`/api/books/categories`, newCategory);
-    console.log(data);
+    dispatch({ type: POST_PRODUCT_CATEGORIES_SUCCESS, payload: data });
   } catch (error) {
-    console.log(error);
+    dispatch({
+      type: POST_PRODUCT_CATEGORIES_FAIL,
+      payload: error.response ? error.response.data : "There's a problem",
+    });
   }
 };
 
@@ -129,14 +151,14 @@ export const postProductCategory = (newCategory) => async () => {
 export const adminUpdateProduct =
   (productId, newDetail) => async (dispatch, getState) => {
     try {
-      dispatch({ type: PRODUCT_UPDATEDETAIL_REQUEST });
+      dispatch({ type: ADMIN_UPDATE_PRODUCT_REQUEST });
 
       await axios.patch(`/api/books/${productId}`, newDetail);
 
-      dispatch({ type: PRODUCT_UPDATEDETAIL_SUCCESS });
+      dispatch({ type: ADMIN_UPDATE_PRODUCT_SUCCESS });
     } catch (error) {
       dispatch({
-        type: PRODUCT_UPDATEDETAIL_FAIL,
+        type: ADMIN_UPDATE_PRODUCT_FAIL,
         payload: error.response ? error.response.data : "There's a problem",
       });
     }
@@ -144,14 +166,14 @@ export const adminUpdateProduct =
 
 export const adminDeleteProduct = (productId) => async (dispatch) => {
   try {
-    dispatch({ type: PRODUCT_UPDATEDELETE_REQUEST });
+    dispatch({ type: ADMIN_DELETE_PRODUCT_REQUEST });
 
     await axios.delete(`/api/books/${productId}`);
 
-    dispatch({ type: PRODUCT_UPDATEDELETE_SUCCESS });
+    dispatch({ type: ADMIN_DELETE_PRODUCT_SUCCESS });
   } catch (error) {
     dispatch({
-      type: PRODUCT_UPDATEDELETE_FAIL,
+      type: ADMIN_DELETE_PRODUCT_FAIL,
       payload: error.response ? error.response.data : "There's a problem",
     });
   }
@@ -159,14 +181,14 @@ export const adminDeleteProduct = (productId) => async (dispatch) => {
 
 export const adminPostProduct = (newProduct) => async (dispatch) => {
   try {
-    dispatch({ type: PRODUCT_UPDATECREATE_REQUEST });
+    dispatch({ type: ADMIN_POST_PRODUCT_REQUEST });
 
     await axios.post(`/api/books/`, newProduct);
 
-    dispatch({ type: PRODUCT_UPDATECREATE_SUCCESS });
+    dispatch({ type: ADMIN_POST_PRODUCT_SUCCESS });
   } catch (error) {
     dispatch({
-      type: PRODUCT_UPDATECREATE_FAIL,
+      type: ADMIN_POST_PRODUCT_FAIL,
       payload: error.response ? error.response.data : "There's a problem",
     });
   }
