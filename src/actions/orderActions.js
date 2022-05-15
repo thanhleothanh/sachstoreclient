@@ -31,23 +31,32 @@ export const postOrder = (orderInfo) => async (dispatch, getState) => {
       cart: { cartItems },
     } = getState();
 
-    const { data } = await axios.post('/api/orders/', orderInfo);
+    const { data } = await axios.post(
+      'https://testsachstore.herokuapp.com/api/orders/',
+      orderInfo
+    );
 
     await Promise.all(
       cartItems.map(async (item) => {
-        await axios.post(`/api/orders/${data.id}/items`, {
-          api_sach: Number(item.sachid),
-          giaban: Number(item.giasach),
-          soluong: Number(item.soluong),
-        });
+        await axios.post(
+          `https://testsachstore.herokuapp.com/api/orders/${data.id}/items`,
+          {
+            api_sach: Number(item.sachid),
+            giaban: Number(item.giasach),
+            soluong: Number(item.soluong),
+          }
+        );
       })
     );
 
     await Promise.all(
       cartItems.map(async (item) => {
-        await axios.patch(`/api/books/${item.sachid}`, {
-          soluong: Number(item.soluongStock - item.soluong),
-        });
+        await axios.patch(
+          `https://testsachstore.herokuapp.com/api/books/${item.sachid}`,
+          {
+            soluong: Number(item.soluongStock - item.soluong),
+          }
+        );
       })
     );
 
@@ -64,7 +73,9 @@ export const getOrder = (orderId) => async (dispatch, getState) => {
   try {
     dispatch({ type: GET_ORDER_REQUEST });
 
-    const { data } = await axios.get(`/api/orders/${orderId}`);
+    const { data } = await axios.get(
+      `https://testsachstore.herokuapp.com/api/orders/${orderId}`
+    );
 
     dispatch({ type: GET_ORDER_SUCCESS, payload: data[0] });
   } catch (error) {
@@ -79,7 +90,9 @@ export const getOrderDetails = (orderId) => async (dispatch, getState) => {
   try {
     dispatch({ type: GET_ORDER_DETAILS_REQUEST });
 
-    const { data } = await axios.get(`/api/orders/${orderId}/items`);
+    const { data } = await axios.get(
+      `https://testsachstore.herokuapp.com/api/orders/${orderId}/items`
+    );
 
     dispatch({ type: GET_ORDER_DETAILS_SUCCESS, payload: data });
   } catch (error) {
@@ -94,7 +107,9 @@ export const payOrder = (orderId) => async (dispatch, getState) => {
   try {
     dispatch({ type: PAY_ORDER_REQUEST });
 
-    const { data } = await axios.post(`/api/orders/${orderId}/pay`);
+    const { data } = await axios.post(
+      `https://testsachstore.herokuapp.com/api/orders/${orderId}/pay`
+    );
 
     dispatch({ type: PAY_ORDER_SUCCESS, payload: data });
   } catch (error) {
@@ -113,7 +128,9 @@ export const getAllOrders = () => async (dispatch, getState) => {
       userLogin: { userInfo },
     } = getState();
 
-    const { data } = await axios.get(`/api/orders/myorders/${userInfo.id}`);
+    const { data } = await axios.get(
+      `https://testsachstore.herokuapp.com/api/orders/myorders/${userInfo.id}`
+    );
 
     dispatch({ type: GET_ALL_ORDERS_SUCCESS, payload: data });
   } catch (error) {
@@ -128,7 +145,9 @@ export const adminGetAllOrders = () => async (dispatch) => {
   try {
     dispatch({ type: ADMIN_GET_ALL_ORDERS_REQUEST });
 
-    const { data } = await axios.get(`/api/orders/`);
+    const { data } = await axios.get(
+      `https://testsachstore.herokuapp.com/api/orders/`
+    );
 
     dispatch({ type: ADMIN_GET_ALL_ORDERS_SUCCESS, payload: data });
   } catch (error) {
@@ -143,7 +162,10 @@ export const adminUpdateOrder = (orderId, newUpdate) => async (dispatch) => {
   try {
     dispatch({ type: ADMIN_UPDATE_ORDER_REQUEST });
 
-    await axios.patch(`/api/orders/${orderId}`, newUpdate);
+    await axios.patch(
+      `https://testsachstore.herokuapp.com/api/orders/${orderId}`,
+      newUpdate
+    );
 
     dispatch({ type: ADMIN_UPDATE_ORDER_SUCCESS });
   } catch (error) {

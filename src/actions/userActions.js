@@ -35,10 +35,13 @@ export const login = (taikhoan, matkhau) => async (dispatch) => {
     dispatch({
       type: USER_LOGIN_REQUEST,
     });
-    const { data } = await axios.post('/api/users/signin', {
-      taikhoan,
-      matkhau,
-    });
+    const { data } = await axios.post(
+      'https://testsachstore.herokuapp.com/api/users/signin',
+      {
+        taikhoan,
+        matkhau,
+      }
+    );
 
     dispatch({
       type: USER_LOGIN_SUCCESS,
@@ -87,7 +90,10 @@ export const register = (newUser) => async (dispatch) => {
     dispatch({
       type: USER_REGISTER_REQUEST,
     });
-    const { data } = await axios.post('/api/users/', newUser);
+    const { data } = await axios.post(
+      'https://testsachstore.herokuapp.com/api/users/',
+      newUser
+    );
 
     dispatch({
       type: USER_REGISTER_SUCCESS,
@@ -119,7 +125,7 @@ export const updateUserDetails =
         userLogin: { userInfo },
       } = getState();
       const { data } = await axios.patch(
-        `/api/users/${userInfo.id}`,
+        `https://testsachstore.herokuapp.com/api/users/${userInfo.id}`,
         newDetailUser
       );
       dispatch({
@@ -146,7 +152,9 @@ export const getAllUsersDetails = () => async (dispatch, getState) => {
     dispatch({
       type: ALL_USERS_DETAILS_REQUEST,
     });
-    const { data } = await axios.get('/api/users');
+    const { data } = await axios.get(
+      'https://testsachstore.herokuapp.com/api/users'
+    );
     dispatch({
       type: ALL_USERS_DETAILS_SUCCESS,
       payload: data,
@@ -165,7 +173,9 @@ export const adminDeleteUser = (userId) => async (dispatch) => {
       type: ADMIN_DELETE_USER_REQUEST,
     });
 
-    await axios.delete(`/api/users/${userId}`);
+    await axios.delete(
+      `https://testsachstore.herokuapp.com/api/users/${userId}`
+    );
 
     dispatch({
       type: ADMIN_DELETE_USER_SUCCESS,
@@ -182,7 +192,7 @@ export const adminPostUser = (newUser) => async (dispatch) => {
   try {
     dispatch({ type: ADMIN_POST_USER_REQUEST });
 
-    await axios.post(`/api/users/`, newUser);
+    await axios.post(`https://testsachstore.herokuapp.com/api/users/`, newUser);
 
     dispatch({ type: ADMIN_POST_USER_SUCCESS });
   } catch (error) {
@@ -197,7 +207,10 @@ export const adminUpdateUser = (userId, newUser) => async (dispatch) => {
   try {
     dispatch({ type: ADMIN_UPDATE_USER_REQUEST });
 
-    await axios.patch(`/api/users/${userId}`, newUser);
+    await axios.patch(
+      `https://testsachstore.herokuapp.com/api/users/${userId}`,
+      newUser
+    );
 
     dispatch({ type: ADMIN_UPDATE_USER_SUCCESS });
   } catch (error) {

@@ -22,7 +22,9 @@ export const listCartItems = () => async (dispatch, getState) => {
       userLogin: { userInfo },
     } = getState();
 
-    const { data } = await axios.get(`/api/cart/${userInfo.id}`);
+    const { data } = await axios.get(
+      `https://testsachstore.herokuapp.com/api/cart/${userInfo.id}`
+    );
     dispatch({
       type: CART_LIST_ITEMS_SUCCESS,
       payload: data,
@@ -43,10 +45,13 @@ export const addCartItem = (sachid, soluong) => async (dispatch, getState) => {
       userLogin: { userInfo },
     } = getState();
 
-    const { data } = await axios.post(`/api/cart/${userInfo.id}`, {
-      api_sach: sachid,
-      soluong: soluong,
-    });
+    const { data } = await axios.post(
+      `https://testsachstore.herokuapp.com/api/cart/${userInfo.id}`,
+      {
+        api_sach: sachid,
+        soluong: soluong,
+      }
+    );
 
     dispatch({
       type: CART_ADD_ITEM_SUCCESS,
@@ -69,10 +74,13 @@ export const updateCartItem =
         userLogin: { userInfo },
       } = getState();
 
-      const { data } = await axios.patch(`/api/cart/${userInfo.id}`, {
-        api_sach: sachid,
-        soluong: soluongmoi,
-      });
+      const { data } = await axios.patch(
+        `https://testsachstore.herokuapp.com/api/cart/${userInfo.id}`,
+        {
+          api_sach: sachid,
+          soluong: soluongmoi,
+        }
+      );
 
       dispatch({
         type: CART_UPDATE_ITEM_SUCCESS,
@@ -94,7 +102,9 @@ export const deleteCartItem = (sachid) => async (dispatch, getState) => {
       userLogin: { userInfo },
     } = getState();
 
-    const { data } = await axios.delete(`/api/cart/${userInfo.id}/${sachid}`);
+    const { data } = await axios.delete(
+      `https://testsachstore.herokuapp.com/api/cart/${userInfo.id}/${sachid}`
+    );
 
     dispatch({
       type: CART_DELETE_ITEM_SUCCESS,

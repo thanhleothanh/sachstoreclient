@@ -39,7 +39,9 @@ export const listProducts = () => async (dispatch) => {
   try {
     dispatch({ type: PRODUCT_LIST_REQUEST });
 
-    const { data } = await axios.get('/api/books/');
+    const { data } = await axios.get(
+      'https://testsachstore.herokuapp.com/api/books/'
+    );
     dispatch({ type: PRODUCT_LIST_SUCCESS, payload: data });
   } catch (error) {
     console.log(error.response);
@@ -54,7 +56,9 @@ export const listProductDetails = (id) => async (dispatch) => {
   try {
     dispatch({ type: PRODUCT_DETAILS_REQUEST });
 
-    const { data } = await axios.get(`/api/books/${id}`);
+    const { data } = await axios.get(
+      `https://testsachstore.herokuapp.com/api/books/${id}`
+    );
     dispatch({ type: PRODUCT_DETAILS_SUCCESS, payload: data[0] });
   } catch (error) {
     dispatch({
@@ -68,7 +72,9 @@ export const getProductAuthors = () => async (dispatch) => {
   try {
     dispatch({ type: GET_PRODUCT_AUTHORS_REQUEST });
 
-    const { data } = await axios.get(`/api/books/authors`);
+    const { data } = await axios.get(
+      `https://testsachstore.herokuapp.com/api/books/authors`
+    );
     dispatch({ type: GET_PRODUCT_AUTHORS_SUCCESS, payload: data });
   } catch (error) {
     dispatch({
@@ -82,7 +88,9 @@ export const getProductPublishers = () => async (dispatch) => {
   try {
     dispatch({ type: GET_PRODUCT_PUBLISHERS_REQUEST });
 
-    const { data } = await axios.get(`/api/books/publishers`);
+    const { data } = await axios.get(
+      `https://testsachstore.herokuapp.com/api/books/publishers`
+    );
     dispatch({ type: GET_PRODUCT_PUBLISHERS_SUCCESS, payload: data });
   } catch (error) {
     dispatch({
@@ -96,7 +104,9 @@ export const getProductCategories = () => async (dispatch) => {
   try {
     dispatch({ type: GET_PRODUCT_CATEGORIES_REQUEST });
 
-    const { data } = await axios.get(`/api/books/categories`);
+    const { data } = await axios.get(
+      `https://testsachstore.herokuapp.com/api/books/categories`
+    );
     dispatch({ type: GET_PRODUCT_CATEGORIES_SUCCESS, payload: data });
   } catch (error) {
     dispatch({
@@ -110,7 +120,10 @@ export const postProductAuthor = (newAuthor) => async (dispatch) => {
   try {
     dispatch({ type: POST_PRODUCT_AUTHORS_REQUEST });
 
-    const { data } = await axios.post(`/api/books/authors`, newAuthor);
+    const { data } = await axios.post(
+      `https://testsachstore.herokuapp.com/api/books/authors`,
+      newAuthor
+    );
     dispatch({ type: POST_PRODUCT_AUTHORS_SUCCESS, payload: data });
   } catch (error) {
     dispatch({
@@ -123,7 +136,10 @@ export const postProductAuthor = (newAuthor) => async (dispatch) => {
 export const postProductPublisher = (newPublisher) => async (dispatch) => {
   try {
     dispatch({ type: POST_PRODUCT_PUBLISHERS_REQUEST });
-    const { data } = await axios.post(`/api/books/publishers`, newPublisher);
+    const { data } = await axios.post(
+      `https://testsachstore.herokuapp.com/api/books/publishers`,
+      newPublisher
+    );
     dispatch({ type: POST_PRODUCT_PUBLISHERS_SUCCESS, payload: data });
   } catch (error) {
     dispatch({
@@ -136,7 +152,10 @@ export const postProductPublisher = (newPublisher) => async (dispatch) => {
 export const postProductCategory = (newCategory) => async (dispatch) => {
   try {
     dispatch({ type: POST_PRODUCT_CATEGORIES_REQUEST });
-    const { data } = await axios.post(`/api/books/categories`, newCategory);
+    const { data } = await axios.post(
+      `https://testsachstore.herokuapp.com/api/books/categories`,
+      newCategory
+    );
     dispatch({ type: POST_PRODUCT_CATEGORIES_SUCCESS, payload: data });
   } catch (error) {
     dispatch({
@@ -153,7 +172,10 @@ export const adminUpdateProduct =
     try {
       dispatch({ type: ADMIN_UPDATE_PRODUCT_REQUEST });
 
-      await axios.patch(`/api/books/${productId}`, newDetail);
+      await axios.patch(
+        `https://testsachstore.herokuapp.com/api/books/${productId}`,
+        newDetail
+      );
 
       dispatch({ type: ADMIN_UPDATE_PRODUCT_SUCCESS });
     } catch (error) {
@@ -168,7 +190,9 @@ export const adminDeleteProduct = (productId) => async (dispatch) => {
   try {
     dispatch({ type: ADMIN_DELETE_PRODUCT_REQUEST });
 
-    await axios.delete(`/api/books/${productId}`);
+    await axios.delete(
+      `https://testsachstore.herokuapp.com/api/books/${productId}`
+    );
 
     dispatch({ type: ADMIN_DELETE_PRODUCT_SUCCESS });
   } catch (error) {
@@ -183,7 +207,10 @@ export const adminPostProduct = (newProduct) => async (dispatch) => {
   try {
     dispatch({ type: ADMIN_POST_PRODUCT_REQUEST });
 
-    await axios.post(`/api/books/`, newProduct);
+    await axios.post(
+      `https://testsachstore.herokuapp.com/api/books/`,
+      newProduct
+    );
 
     dispatch({ type: ADMIN_POST_PRODUCT_SUCCESS });
   } catch (error) {
