@@ -19,9 +19,14 @@ import notify from '../utils/notify';
 
 const ProductScreen = ({ history, match }) => {
   const dispatch = useDispatch();
+  const [qty, setQty] = useState(1);
   const { loading, product, error } = useSelector(
     (state) => state.productDetails
   );
+
+  useEffect(() => {
+    dispatch(listProductDetails(match.params.id));
+  }, []);
 
   const {
     loading: loadingPostCart,
@@ -40,17 +45,8 @@ const ProductScreen = ({ history, match }) => {
     }
   }, [loadingPostCart]);
 
-  const [qty, setQty] = useState(1);
-
-  useEffect(() => {
-    dispatch(listProductDetails(match.params.id));
-  }, []);
-
   const addToCartHandler = () => {
     dispatch(addCartItem(match.params.id, qty));
-    setTimeout(() => {
-      history.push('/cart');
-    }, 500);
   };
 
   return (
@@ -65,13 +61,28 @@ const ProductScreen = ({ history, match }) => {
       ) : (
         product && (
           <>
+            {loadingPostCart && <Loader />}
             <Row>
               <Col md={6}>
                 <ListGroup variant='flush'>
                   <ListGroupItem>
                     <h3>{product.tensach}</h3>
                   </ListGroupItem>
-                  <ListGroupItem>{product.mota}</ListGroupItem>
+                  {product.tentacgia && (
+                    <ListGroupItem>
+                      Sách của tác giả: {product.tentacgia}
+                    </ListGroupItem>
+                  )}
+                  {product.tennhaxuatban && (
+                    <ListGroupItem>
+                      Nhà xuất bản: {product.tennhaxuatban}
+                    </ListGroupItem>
+                  )}
+                  {product.tentheloai && (
+                    <ListGroupItem>
+                      Thể loại: {product.tentheloai}
+                    </ListGroupItem>
+                  )}
                 </ListGroup>
                 <Card>
                   <ListGroup variant='flush'>

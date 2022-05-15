@@ -7,6 +7,7 @@ import { postOrder } from '../actions/orderActions';
 import { deleteCartItem } from '../actions/cartActions';
 import notify from '../utils/notify';
 import { listCartItems } from '../actions/cartActions';
+import Loader from '../components/Loader';
 
 const PlaceOrderScreen = ({ history }) => {
   const { userInfo } = useSelector((state) => state.userLogin);
@@ -22,9 +23,6 @@ const PlaceOrderScreen = ({ history }) => {
       history.push('/login?redirect=placeorder');
     }
   }, [userInfo]);
-  useEffect(() => {
-    dispatch(listCartItems());
-  }, []);
 
   const subtotal =
     cartItems &&
@@ -48,12 +46,10 @@ const PlaceOrderScreen = ({ history }) => {
 
   useEffect(() => {
     if (order) {
-      setTimeout(() => {
-        cartItems.forEach((item) => {
-          dispatch(deleteCartItem(item.sachid));
-        });
-        history.push(`/orders/${order.id}`);
-      }, 500);
+      cartItems.forEach((item) => {
+        dispatch(deleteCartItem(item.sachid));
+      });
+      history.push(`/orders/${order.id}`);
     }
   }, [order]);
 
@@ -73,6 +69,7 @@ const PlaceOrderScreen = ({ history }) => {
 
   return (
     <>
+      {loadingPostOrder && <Loader />}
       <Container className='justify-content-left'>
         <Row>
           <h2>Thông tin khách hàng</h2>

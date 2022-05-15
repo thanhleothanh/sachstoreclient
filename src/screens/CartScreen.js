@@ -61,17 +61,25 @@ const CartScreen = ({ history }) => {
     }
   }, [loadingDeleteCart]);
 
+  useEffect(() => {
+    if (
+      errorDeleteCart ||
+      errorUpdateCart ||
+      successDeleteCart ||
+      successUpdateCart
+    )
+      dispatch(listCartItems());
+  }, [errorDeleteCart, errorUpdateCart, successDeleteCart, successUpdateCart]);
+
   const updateCartItemHandler = (sachid, soluongmoi) => {
     dispatch(updateCartItem(sachid, soluongmoi));
-    setTimeout(() => {
-      dispatch(listCartItems());
-    }, 500);
   };
   const deleteCartItemHandler = (sachid) => {
-    dispatch(deleteCartItem(sachid));
-    setTimeout(() => {
-      dispatch(listCartItems());
-    }, 500);
+    if (
+      window.confirm('Bạn có chắc chắn muốn xoá sản phẩm này khỏi giỏ hàng!')
+    ) {
+      dispatch(deleteCartItem(sachid));
+    }
   };
   const checkoutHandler = () => {
     history.push('/placeorder');
@@ -95,126 +103,132 @@ const CartScreen = ({ history }) => {
           <Message>{error}</Message>
         ) : (
           cartItems && (
-            <Row>
-              <Col md={4}>
-                <h2>Giỏ hàng của bạn</h2>
-                <Card>
-                  <ListGroup variant='flush'>
-                    <ListGroupItem>
-                      <h4>
-                        Tổng cộng: (
-                        {cartItems.reduce((acc, item) => acc + item.soluong, 0)}
-                        ) Sản phẩm
-                      </h4>
-                    </ListGroupItem>
-                    <ListGroupItem>
-                      <strong>Tổng tiền: </strong>
-                      {cartItems
-                        .reduce((acc, item) => acc + item.tongtien, 0)
-                        .toLocaleString('vi', {
-                          style: 'currency',
-                          currency: 'VND',
-                        })}
-                    </ListGroupItem>
-                    <ListGroupItem>
-                      <Button
-                        type='button'
-                        className='btn-block'
-                        disabled={
-                          cartItems.length === 0 ||
-                          cartItems.reduce((acc, item) => acc + item.qty, 0) *
-                            1 ===
+            <>
+              {(loadingDeleteCart || loadingUpdateCart) && <Loader />}
+              <Row>
+                <Col md={4}>
+                  <h2>Giỏ hàng của bạn</h2>
+                  <Card>
+                    <ListGroup variant='flush'>
+                      <ListGroupItem>
+                        <h4>
+                          Tổng cộng: (
+                          {cartItems.reduce(
+                            (acc, item) => acc + item.soluong,
                             0
-                        }
-                        onClick={() => checkoutHandler()}
-                      >
-                        Đặt hàng
+                          )}
+                          ) Sản phẩm
+                        </h4>
+                      </ListGroupItem>
+                      <ListGroupItem>
+                        <strong>Tổng tiền: </strong>
+                        {cartItems
+                          .reduce((acc, item) => acc + item.tongtien, 0)
+                          .toLocaleString('vi', {
+                            style: 'currency',
+                            currency: 'VND',
+                          })}
+                      </ListGroupItem>
+                      <ListGroupItem>
+                        <Button
+                          type='button'
+                          className='btn-block'
+                          disabled={
+                            cartItems.length === 0 ||
+                            cartItems.reduce((acc, item) => acc + item.qty, 0) *
+                              1 ===
+                              0
+                          }
+                          onClick={() => checkoutHandler()}
+                        >
+                          Đặt hàng
+                        </Button>
+                      </ListGroupItem>
+                    </ListGroup>
+                  </Card>
+                  {cartItems.length !== 0 && (
+                    <Link to='/'>
+                      <Button className='btn mt-3' block>
+                        <strong>Tiếp tục mua sắm</strong>
                       </Button>
-                    </ListGroupItem>
-                  </ListGroup>
-                </Card>
-                {cartItems.length !== 0 && (
-                  <Link to='/'>
-                    <Button className='btn mt-3' block>
-                      <strong>Tiếp tục mua sắm</strong>
-                    </Button>
-                  </Link>
-                )}
-              </Col>
-              <Col md={8}>
-                {cartItems && cartItems.length === 0 ? (
-                  <Message>
-                    {'Không có sản phẩm nào trong giỏ hàng!'}
-                    <Link to='/'> Quay lại mua hàng!</Link>
-                  </Message>
-                ) : (
-                  <ListGroup variant='flush'>
-                    {cartItems.map((item) => (
-                      <ListGroupItem key={item.sachid}>
-                        <Row>
-                          <Col md={2}>
-                            <Image
-                              src={item.hinhanh}
-                              alt='product-image'
-                              fluid
-                              rounded
-                            />
-                          </Col>
-                          <Col md={4}>
-                            <Link to={`/product/${item.sachid}`}>
-                              {item.tensach}
-                            </Link>
-                          </Col>
-                          <Col md={2}>
-                            {item.giasach.toLocaleString('vi', {
-                              style: 'currency',
-                              currency: 'VND',
-                            })}
-                          </Col>
+                    </Link>
+                  )}
+                </Col>
+                <Col md={8}>
+                  {cartItems && cartItems.length === 0 ? (
+                    <Message>
+                      {'Không có sản phẩm nào trong giỏ hàng!'}
+                      <Link to='/'> Quay lại mua hàng!</Link>
+                    </Message>
+                  ) : (
+                    <ListGroup variant='flush'>
+                      {cartItems.map((item) => (
+                        <ListGroupItem key={item.sachid}>
+                          <Row>
+                            <Col md={2}>
+                              <Image
+                                src={item.hinhanh}
+                                alt='product-image'
+                                fluid
+                                rounded
+                              />
+                            </Col>
+                            <Col md={4}>
+                              <Link to={`/product/${item.sachid}`}>
+                                {item.tensach}
+                              </Link>
+                            </Col>
+                            <Col md={2}>
+                              {item.giasach.toLocaleString('vi', {
+                                style: 'currency',
+                                currency: 'VND',
+                              })}
+                            </Col>
 
-                          <Col md={2}>
-                            {item.soluongStock === 0 ? (
-                              <span>Hết hàng</span>
-                            ) : (
-                              <FormControl
-                                size='sm'
-                                as='select'
-                                value={item.soluong}
-                                onChange={(e) =>
-                                  updateCartItemHandler(
-                                    item.sachid,
-                                    Number(e.target.value)
-                                  )
+                            <Col md={2}>
+                              {item.soluongStock === 0 ? (
+                                <span>Hết hàng</span>
+                              ) : (
+                                <FormControl
+                                  size='sm'
+                                  as='select'
+                                  value={item.soluong}
+                                  onChange={(e) =>
+                                    updateCartItemHandler(
+                                      item.sachid,
+                                      Number(e.target.value)
+                                    )
+                                  }
+                                >
+                                  {[...Array(item.soluongStock).keys()].map(
+                                    (x) => (
+                                      <option key={x + 1} value={x + 1}>
+                                        {x + 1}
+                                      </option>
+                                    )
+                                  )}
+                                </FormControl>
+                              )}
+                            </Col>
+                            <Col md={2}>
+                              <Button
+                                type='btn'
+                                variant='dark'
+                                onClick={(e) =>
+                                  deleteCartItemHandler(item.sachid)
                                 }
                               >
-                                {[...Array(item.soluongStock).keys()].map(
-                                  (x) => (
-                                    <option key={x + 1} value={x + 1}>
-                                      {x + 1}
-                                    </option>
-                                  )
-                                )}
-                              </FormControl>
-                            )}
-                          </Col>
-                          <Col md={2}>
-                            <Button
-                              type='btn'
-                              variant='dark'
-                              onClick={(e) =>
-                                deleteCartItemHandler(item.sachid)
-                              }
-                            >
-                              <i className='fas fa-trash' />
-                            </Button>
-                          </Col>
-                        </Row>
-                      </ListGroupItem>
-                    ))}
-                  </ListGroup>
-                )}
-              </Col>
-            </Row>
+                                <i className='fas fa-trash' />
+                              </Button>
+                            </Col>
+                          </Row>
+                        </ListGroupItem>
+                      ))}
+                    </ListGroup>
+                  )}
+                </Col>
+              </Row>
+            </>
           )
         ))}
     </>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Button,
   OverlayTrigger,
@@ -32,6 +33,17 @@ const ADMINOrders = ({ history }) => {
   const [phone, setPhone] = useState('');
   const [ishoanthanh, setIshoanthanh] = useState(false);
 
+  useEffect(() => {
+    if (!userInfo) {
+      history.push('/login');
+    } else if (!userInfo.vaitro == 'nhanvien') {
+      history.push('/');
+    }
+    if (userInfo) {
+      dispatch(adminGetAllOrders());
+    }
+  }, [userInfo]);
+
   const {
     loading: loadingUpdate,
     error: errorUpdate,
@@ -46,17 +58,9 @@ const ADMINOrders = ({ history }) => {
       });
     }
   }, [loadingUpdate]);
-
   useEffect(() => {
-    if (!userInfo) {
-      history.push('/login');
-    } else if (!userInfo.vaitro == 'nhanvien') {
-      history.push('/');
-    }
-    if (userInfo && !loadingUpdate) {
-      dispatch(adminGetAllOrders());
-    }
-  }, [userInfo, loadingUpdate]);
+    if (successUpdate || errorUpdate) dispatch(adminGetAllOrders());
+  }, [successUpdate, errorUpdate]);
 
   const updateHandler = (orderId) => {
     const order = adminAllOrders.find((e) => e.donhangid === orderId);
@@ -70,15 +74,13 @@ const ADMINOrders = ({ history }) => {
   };
   const actualUpdateHandler = (e) => {
     e.preventDefault();
-    setTimeout(() => {
-      dispatch(
-        adminUpdateOrder(orderId, {
-          diachi: address,
-          sodienthoai: phone,
-          isHoanthanh: ishoanthanh,
-        })
-      );
-    }, 500);
+    dispatch(
+      adminUpdateOrder(orderId, {
+        diachi: address,
+        sodienthoai: phone,
+        isHoanthanh: ishoanthanh,
+      })
+    );
     handleClose();
   };
 
@@ -150,14 +152,18 @@ const ADMINOrders = ({ history }) => {
 
   return (
     <>
-      {(loading || loadingUpdate) && <Loader />}
-      {(error || errorUpdate) && (
-        <Message variant='danger'>
-          {error || errorUpdate} Hệ thống đang có lỗi!
-        </Message>
+      {loading ? (
+        <Loader />
+      ) : (
+        (error || errorUpdate) && (
+          <Message variant='danger'>
+            {error || errorUpdate} Hệ thống đang có lỗi!
+          </Message>
+        )
       )}
-      {!loading && (
+      {!loading && !error && adminAllOrders && (
         <>
+          {loadingUpdate && <Loader />}
           <h2>Tất cả đơn hàng</h2>
           <h5>Tổng cộng: {adminAllOrders.length} đơn hàng </h5>
           <Table hover striped responsive>
@@ -179,7 +185,9 @@ const ADMINOrders = ({ history }) => {
               {adminAllOrders.map((order) => (
                 <tr key={order.donhangid}>
                   <td>
-                    <a href={`/orders/${order.donhangid}`}>{order.donhangid}</a>
+                    <Link to={`/orders/${order.donhangid}`}>
+                      {order.donhangid}
+                    </Link>
                   </td>
                   <td>{order.donhanghoten}</td>
                   <td>{order.donhangdiachi}</td>

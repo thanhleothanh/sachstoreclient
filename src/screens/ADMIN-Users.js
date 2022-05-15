@@ -69,28 +69,28 @@ const ADMINUsers = ({ history }) => {
   //toastify
   //toastify
   const {
-    loading: loadinAdminPostUser,
+    loading: loadingAdminPostUser,
     success: successAdminPostUser,
     error: errorAdminPostUser,
   } = useSelector((state) => state.adminPostUser);
   useEffect(() => {
-    if (!loadinAdminPostUser && (successAdminPostUser || errorAdminPostUser)) {
+    if (!loadingAdminPostUser && (successAdminPostUser || errorAdminPostUser)) {
       if (successAdminPostUser) notify(false, 'Thêm người dùng thành công!');
       else notify(true, errorAdminPostUser);
       dispatch({
         type: 'ADMIN_POST_USER_RESET',
       });
     }
-  }, [loadinAdminPostUser]);
+  }, [loadingAdminPostUser]);
 
   const {
-    loading: loadinAdminUpdateUser,
+    loading: loadingAdminUpdateUser,
     success: successAdminUpdateUser,
     error: errorAdminUpdateUser,
   } = useSelector((state) => state.adminUpdateUser);
   useEffect(() => {
     if (
-      !loadinAdminUpdateUser &&
+      !loadingAdminUpdateUser &&
       (successAdminUpdateUser || errorAdminUpdateUser)
     ) {
       if (successAdminUpdateUser)
@@ -100,16 +100,16 @@ const ADMINUsers = ({ history }) => {
         type: 'ADMIN_UPDATE_USER_RESET',
       });
     }
-  }, [loadinAdminUpdateUser]);
+  }, [loadingAdminUpdateUser]);
 
   const {
-    loading: loadinAdminDeleteUser,
+    loading: loadingAdminDeleteUser,
     success: successAdminDeleteUser,
     error: errorAdminDeleteUser,
   } = useSelector((state) => state.adminDeleteUser);
   useEffect(() => {
     if (
-      !loadinAdminDeleteUser &&
+      !loadingAdminDeleteUser &&
       (successAdminDeleteUser || errorAdminDeleteUser)
     ) {
       if (successAdminDeleteUser) notify(false, 'Xoá người dùng thành công!');
@@ -118,17 +118,33 @@ const ADMINUsers = ({ history }) => {
         type: 'ADMIN_DELETE_USER_RESET',
       });
     }
-  }, [loadinAdminDeleteUser]);
+  }, [loadingAdminDeleteUser]);
 
   //toastify
   //toastify
   //toastify
+
+  useEffect(() => {
+    if (
+      errorAdminDeleteUser ||
+      errorAdminPostUser ||
+      errorAdminUpdateUser ||
+      successAdminDeleteUser ||
+      successAdminPostUser ||
+      successAdminUpdateUser
+    )
+      dispatch(getAllUsersDetails());
+  }, [
+    errorAdminDeleteUser,
+    errorAdminPostUser,
+    errorAdminUpdateUser,
+    successAdminDeleteUser,
+    successAdminPostUser,
+    successAdminUpdateUser,
+  ]);
   const deleteUserHandler = (userId) => {
     if (window.confirm('Bạn có chắc không?')) {
       dispatch(adminDeleteUser(userId));
-      setTimeout(() => {
-        dispatch(getAllUsersDetails());
-      }, 500);
     }
   };
 
@@ -154,9 +170,6 @@ const ADMINUsers = ({ history }) => {
         hoten: hotenUpdate,
       })
     );
-    setTimeout(() => {
-      dispatch(getAllUsersDetails());
-    }, 500);
 
     handleCloseUpdate();
   };
@@ -169,7 +182,7 @@ const ADMINUsers = ({ history }) => {
           backdrop='static'
           keyboard={false}
           centered
-          size='lg'
+          size='md'
         >
           <Modal.Header closeButton>
             <Modal.Title>Cập nhật tài khoản</Modal.Title>
@@ -192,7 +205,7 @@ const ADMINUsers = ({ history }) => {
                   <Form.Label>Mật khẩu</Form.Label>
                   <Form.Control
                     type='text'
-                    placeholder='Mật khẩu'
+                    placeholder='Reset mật khẩu'
                     value={matkhauUpdate}
                     onChange={(e) => setMatkhauUpdate(e.target.value)}
                     autoComplete='off'
@@ -212,6 +225,7 @@ const ADMINUsers = ({ history }) => {
                   <Form.Label>Số điện thoại</Form.Label>
                   <Form.Control
                     type='text'
+                    maxLength={11}
                     placeholder='Số điện thoại'
                     value={sodienthoaiUpdate}
                     onChange={(e) => setSodienthoaiUpdate(e.target.value)}
@@ -279,9 +293,6 @@ const ADMINUsers = ({ history }) => {
       setSodienthoai('');
       setVaitro('');
       setEmail('');
-      setTimeout(() => {
-        dispatch(getAllUsersDetails());
-      }, 500);
       handleCloseCreate();
     } else setValidatedCreate(true);
   };
@@ -294,7 +305,7 @@ const ADMINUsers = ({ history }) => {
           backdrop='static'
           keyboard={false}
           centered
-          size='lg'
+          size='md'
         >
           <Modal.Header closeButton>
             <Modal.Title>Thêm tài khoản mới</Modal.Title>
@@ -352,6 +363,7 @@ const ADMINUsers = ({ history }) => {
                   <Form.Label>Số điện thoại</Form.Label>
                   <Form.Control
                     type='text'
+                    maxLength={11}
                     placeholder='Số điện thoại'
                     value={sodienthoai}
                     onChange={(e) => setSodienthoai(e.target.value)}
@@ -426,82 +438,87 @@ const ADMINUsers = ({ history }) => {
     <>
       <h2>Tất cả người dùng</h2>
       <>
-        {loading || loadingUpdate ? (
+        {loading ? (
           <Loader />
         ) : error ? (
           <Message variant='danger'>{error}</Message>
         ) : (
-          <>
-            <Row>
-              <Col>
-                <h2>Tổng cộng: {users.length} người dùng</h2>
-              </Col>
-              <Col className='text-right'>
-                <Button variant='dark' onClick={createHandler}>
-                  Thêm tài khoản mới
-                </Button>
-              </Col>
-            </Row>
-            <Table hover responsive striped>
-              <thead>
-                <tr>
-                  <th>USER ID</th>
-                  <th>Tài khoản</th>
-                  <th>Họ tên</th>
-                  <th>Email</th>
-                  <th>Địa chỉ</th>
-                  <th>Số điện thoại</th>
-                  <th>Vai trò</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user.id}>
-                    <td>{user.id}</td>
-                    <td>{user.taikhoan}</td>
-                    <td>
-                      {user.hoten}
-                      {user.id === userInfo.id && ' (You)'}
-                    </td>
-                    <td>{user.email}</td>
-                    <td>{user.diachi}</td>
-                    <td>{user.sodienthoai}</td>
-                    <td>
-                      {user.vaitro === 'admin'
-                        ? 'Admin'
-                        : user.vaitro === 'nhanvien'
-                        ? 'Nhân viên'
-                        : 'Khách hàng'}
-                    </td>
-                    <td>
-                      <OverlayTrigger
-                        placement='top'
-                        delay={{ show: 150, hide: 150 }}
-                        overlay={renderTooltipUpdate}
-                      >
-                        <i
-                          className='fas fa-edit mr-3 fa-2x'
-                          onClick={() => updateUserHandler(user.id)}
-                        />
-                      </OverlayTrigger>
-                      <OverlayTrigger
-                        placement='top'
-                        delay={{ show: 150, hide: 150 }}
-                        overlay={renderTooltipDelete}
-                      >
-                        <i
-                          className='fas fa-ban fa-2x'
-                          onClick={() => deleteUserHandler(user.id)}
-                        />
-                      </OverlayTrigger>
-                    </td>
+          users && (
+            <>
+              {(loadingAdminDeleteUser ||
+                loadingAdminPostUser ||
+                loadingAdminUpdateUser) && <Loader />}
+              <Row>
+                <Col>
+                  <h2>Tổng cộng: {users.length} người dùng</h2>
+                </Col>
+                <Col className='text-right'>
+                  <Button variant='dark' onClick={createHandler}>
+                    Thêm tài khoản mới
+                  </Button>
+                </Col>
+              </Row>
+              <Table hover responsive striped>
+                <thead>
+                  <tr>
+                    <th>USER ID</th>
+                    <th>Tài khoản</th>
+                    <th>Họ tên</th>
+                    <th>Email</th>
+                    <th>Địa chỉ</th>
+                    <th>Số điện thoại</th>
+                    <th>Vai trò</th>
                   </tr>
-                ))}
-              </tbody>
-            </Table>
-            {renderCreateModal()}
-            {renderUpdateModal()}
-          </>
+                </thead>
+                <tbody>
+                  {users.map((user) => (
+                    <tr key={user.id}>
+                      <td>{user.id}</td>
+                      <td>{user.taikhoan}</td>
+                      <td>
+                        {user.hoten}
+                        {user.id === userInfo.id && ' (Bạn)'}
+                      </td>
+                      <td>{user.email}</td>
+                      <td>{user.diachi}</td>
+                      <td>{user.sodienthoai}</td>
+                      <td>
+                        {user.vaitro === 'admin'
+                          ? 'Admin'
+                          : user.vaitro === 'nhanvien'
+                          ? 'Nhân viên'
+                          : 'Khách hàng'}
+                      </td>
+                      <td>
+                        <OverlayTrigger
+                          placement='top'
+                          delay={{ show: 150, hide: 150 }}
+                          overlay={renderTooltipUpdate}
+                        >
+                          <i
+                            className='fas fa-edit mr-3 fa-2x'
+                            onClick={() => updateUserHandler(user.id)}
+                          />
+                        </OverlayTrigger>
+                        <OverlayTrigger
+                          placement='top'
+                          delay={{ show: 150, hide: 150 }}
+                          overlay={renderTooltipDelete}
+                        >
+                          <i
+                            className='fas fa-ban fa-2x'
+                            onClick={() => deleteUserHandler(user.id)}
+                          />
+                        </OverlayTrigger>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+              {renderCreateModal()}
+              {renderUpdateModal()}
+            </>
+          )
         )}
       </>
     </>

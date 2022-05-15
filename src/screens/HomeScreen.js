@@ -1,12 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Col, Row } from 'react-bootstrap';
+import { Carousel, Col, Row } from 'react-bootstrap';
 import Product from './../components/Product';
 import { listProducts } from './../actions/productActions';
 import Loader from './../components/Loader';
 import Message from './../components/Message';
 
 const HomeScreen = () => {
+  const [index, setIndex] = useState(0);
   const dispatch = useDispatch();
   const { loading, error, products } = useSelector(
     (state) => state.productList
@@ -17,9 +18,31 @@ const HomeScreen = () => {
     dispatch({ type: 'GET_ORDER_DETAILS_RESET' });
   }, [dispatch]);
 
+  const handleSelect = (selectedIndex, e) => {
+    setIndex(selectedIndex);
+  };
+
   return (
     <>
-      <h2>Sản phẩm mới nhất</h2>
+      <Carousel activeIndex={index} onSelect={handleSelect}>
+        <Carousel.Item>
+          <img
+            className='d-block w-100'
+            src='carousel/carousel2.png'
+            alt='Second slide'
+          />
+        </Carousel.Item>
+        <Carousel.Item>
+          <img
+            className='d-block w-100'
+            src='carousel/carousel3.jpg'
+            alt='Third slide'
+          />
+
+          <Carousel.Caption></Carousel.Caption>
+        </Carousel.Item>
+      </Carousel>
+      <h2 className='mt-5'>Sản phẩm mới nhất</h2>
       {loading ? (
         <Loader />
       ) : error ? (

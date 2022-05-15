@@ -35,9 +35,6 @@ const OrderScreen = ({ history, match }) => {
     } else {
       dispatch(getOrder(orderId));
       dispatch(getOrderDetails(orderId));
-      setTimeout(() => {
-        dispatch({ type: 'CART_DELETE_ITEM_RESET' });
-      }, 500);
     }
   }, [userInfo]);
 
@@ -55,6 +52,17 @@ const OrderScreen = ({ history, match }) => {
       });
     }
   }, [loadingPayOrder]);
+
+  const {
+    loading: loadingDeleteCart,
+    success: successDeleteCart,
+    error: errorDeleteCart,
+  } = useSelector((state) => state.deleteCart);
+  useEffect(() => {
+    if (!loadingDeleteCart && (successDeleteCart || errorDeleteCart)) {
+      dispatch({ type: 'CART_DELETE_ITEM_RESET' });
+    }
+  }, [loadingDeleteCart]);
 
   const payOrderHandler = () => {
     if (window.confirm('Bạn có xác nhận muốn thanh toán đơn hàng này!')) {
@@ -74,8 +82,11 @@ const OrderScreen = ({ history, match }) => {
       ) : error ? (
         <Message variant='danger'>{error}</Message>
       ) : (
+        !loading &&
+        !error &&
         order && (
           <>
+            {(loadingPayOrder || loadingDetails) && <Loader />}
             <Row>
               <h2>Order ID: #{orderId}</h2>
             </Row>
@@ -115,9 +126,11 @@ const OrderScreen = ({ history, match }) => {
                         <Message variant='danger'>
                           Đơn hàng chưa được thanh toán!
                         </Message>
-                        <Button onClick={payOrderHandler}>
-                          Thanh toán (giả lập quá trình thanh toán)
-                        </Button>
+                        {order.khachhangid === userInfo.id && (
+                          <Button onClick={payOrderHandler}>
+                            Thanh toán (giả lập quá trình thanh toán)
+                          </Button>
+                        )}
                       </div>
                     ) : (
                       <Message variant='success'>

@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateUserDetails } from './../actions/userActions';
 import AllOrdersFromUser from './../components/AllOrdersFromUser';
 import notify from '../utils/notify';
+import Loader from '../components/Loader';
 
 const ProfileScreen = ({ history }) => {
   const [hoten, setHoten] = useState('');
@@ -46,11 +47,11 @@ const ProfileScreen = ({ history }) => {
   const updateHandler = (e) => {
     e.preventDefault();
     dispatch(updateUserDetails({ hoten, diachi, sodienthoai, email }));
-    setTimeout(() => window.location.reload(), 1000);
   };
 
   return (
     <>
+      {loadingUpdateUser && <Loader />}
       <Row>
         <Col md={9}>
           <h3>Các đơn hàng đã đặt của bạn</h3>
@@ -83,6 +84,7 @@ const ProfileScreen = ({ history }) => {
               <Form.Group controlId='hoten'>
                 <Form.Label>Số điện thoại</Form.Label>
                 <Form.Control
+                  maxLength={11}
                   type='text'
                   placeholder='Nhap so dien thoai moi'
                   value={sodienthoai}
@@ -115,7 +117,6 @@ const ProfileScreen = ({ history }) => {
                 e.preventDefault();
                 if (matkhau === userInfo.matkhau && matkhaumoi) {
                   dispatch(updateUserDetails({ matkhau: matkhaumoi }));
-                  setTimeout(() => window.location.reload(), 1500);
                 } else if (!matkhau) {
                   dispatch({
                     type: 'USER_UPDATE_DETAILS_FAIL',

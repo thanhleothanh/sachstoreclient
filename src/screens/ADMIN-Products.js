@@ -62,6 +62,7 @@ const ADMINProducts = ({ history }) => {
 
   //update details
   const [productId, setProductId] = useState('');
+  const [imageUpdate, setImageUpdate] = useState('');
   const [nameUpdate, setNameUpdate] = useState('');
   const [stockUpdate, setStockUpdate] = useState('');
   const [priceUpdate, setPriceUpdate] = useState('');
@@ -97,13 +98,13 @@ const ADMINProducts = ({ history }) => {
   //toastify
 
   const {
-    loading: loadinAdminUpdateProduct,
+    loading: loadingAdminUpdateProduct,
     success: successAdminUpdateProduct,
     error: errorAdminUpdateProduct,
   } = useSelector((state) => state.adminUpdateProduct);
   useEffect(() => {
     if (
-      !loadinAdminUpdateProduct &&
+      !loadingAdminUpdateProduct &&
       (successAdminUpdateProduct || errorAdminUpdateProduct)
     ) {
       if (successAdminUpdateProduct)
@@ -113,16 +114,16 @@ const ADMINProducts = ({ history }) => {
         type: 'ADMIN_UPDATE_PRODUCT_RESET',
       });
     }
-  }, [loadinAdminUpdateProduct]);
+  }, [loadingAdminUpdateProduct]);
 
   const {
-    loading: loadinAdminDeleteProduct,
+    loading: loadingAdminDeleteProduct,
     success: successAdminDeleteProduct,
     error: errorAdminDeleteProduct,
   } = useSelector((state) => state.adminDeleteProduct);
   useEffect(() => {
     if (
-      !loadinAdminDeleteProduct &&
+      !loadingAdminDeleteProduct &&
       (successAdminDeleteProduct || errorAdminDeleteProduct)
     ) {
       if (successAdminDeleteProduct) notify(false, 'Xoá sản phẩm thành công!');
@@ -131,16 +132,16 @@ const ADMINProducts = ({ history }) => {
         type: 'ADMIN_DELETE_PRODUCT_RESET',
       });
     }
-  }, [loadinAdminDeleteProduct]);
+  }, [loadingAdminDeleteProduct]);
 
   const {
-    loading: loadinAdminPostProduct,
+    loading: loadingAdminPostProduct,
     success: successAdminPostProduct,
     error: errorAdminPostProduct,
   } = useSelector((state) => state.adminPostProduct);
   useEffect(() => {
     if (
-      !loadinAdminPostProduct &&
+      !loadingAdminPostProduct &&
       (successAdminPostProduct || errorAdminPostProduct)
     ) {
       if (successAdminPostProduct) notify(false, 'Thêm sản phẩm thành công!');
@@ -149,16 +150,16 @@ const ADMINProducts = ({ history }) => {
         type: 'ADMIN_POST_PRODUCT_RESET',
       });
     }
-  }, [loadinAdminPostProduct]);
+  }, [loadingAdminPostProduct]);
 
   const {
-    loading: loadinPostCategories,
+    loading: loadingPostCategories,
     success: successPostCategories,
     error: errorPostCategories,
   } = useSelector((state) => state.postCategories);
   useEffect(() => {
     if (
-      !loadinPostCategories &&
+      !loadingPostCategories &&
       (successPostCategories || errorPostCategories)
     ) {
       if (successPostCategories)
@@ -168,16 +169,16 @@ const ADMINProducts = ({ history }) => {
         type: 'POST_PRODUCT_CATEGORIES_RESET',
       });
     }
-  }, [loadinPostCategories]);
+  }, [loadingPostCategories]);
 
   const {
-    loading: loadinPostPublishers,
+    loading: loadingPostPublishers,
     success: successPostPublishers,
     error: errorPostPublishers,
   } = useSelector((state) => state.postPublishers);
   useEffect(() => {
     if (
-      !loadinPostPublishers &&
+      !loadingPostPublishers &&
       (successPostPublishers || errorPostPublishers)
     ) {
       if (successPostPublishers)
@@ -187,30 +188,61 @@ const ADMINProducts = ({ history }) => {
         type: 'POST_PRODUCT_PUBLISHERS_RESET',
       });
     }
-  }, [loadinPostPublishers]);
+  }, [loadingPostPublishers]);
 
   const {
-    loading: loadinPostAuthors,
+    loading: loadingPostAuthors,
     success: successPostAuthors,
     error: errorPostAuthors,
   } = useSelector((state) => state.postAuthors);
   useEffect(() => {
-    if (!loadinPostAuthors && (successPostAuthors || errorPostAuthors)) {
+    if (!loadingPostAuthors && (successPostAuthors || errorPostAuthors)) {
       if (successPostAuthors) notify(false, 'Thêm tác giả mới thành công!');
       else notify(true, errorPostAuthors);
       dispatch({
         type: 'POST_PRODUCT_AUTHORS_RESET',
       });
     }
-  }, [loadinPostAuthors]);
+  }, [loadingPostAuthors]);
 
   //toastify
   //toastify
   //toastify
+
+  useEffect(() => {
+    if (errorPostCategories || successPostCategories)
+      dispatch(getProductCategories());
+  }, [errorPostCategories, successPostCategories]);
+  useEffect(() => {
+    if (errorPostPublishers || successPostPublishers)
+      dispatch(getProductPublishers());
+  }, [errorPostPublishers, successPostPublishers]);
+  useEffect(() => {
+    if (errorPostAuthors || successPostAuthors) dispatch(getProductAuthors());
+  }, [errorPostAuthors, successPostAuthors]);
+  useEffect(() => {
+    if (
+      errorAdminDeleteProduct ||
+      errorAdminPostProduct ||
+      errorAdminUpdateProduct ||
+      successAdminDeleteProduct ||
+      successAdminPostProduct ||
+      successAdminUpdateProduct
+    )
+      dispatch(listProducts());
+  }, [
+    errorAdminDeleteProduct,
+    errorAdminPostProduct,
+    errorAdminUpdateProduct,
+    successAdminDeleteProduct,
+    successAdminPostProduct,
+    successAdminUpdateProduct,
+  ]);
 
   /////// UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE
   const updateHandler = (productId) => {
     const product = products.find((e) => e.id === productId);
+    setImageUpdate(product.hinhanh);
     setNameUpdate(product.tensach);
     setStockUpdate(product.soluong);
     setPriceUpdate(product.giasach);
@@ -223,14 +255,12 @@ const ADMINProducts = ({ history }) => {
     console.log(stockUpdate);
     dispatch(
       adminUpdateProduct(productId, {
+        hinhanh: imageUpdate,
         tensach: nameUpdate,
         soluong: stockUpdate === '0' ? 0 : stockUpdate * 1,
         giasach: priceUpdate * 1,
       })
     );
-    setTimeout(() => {
-      dispatch(listProducts());
-    }, 500);
 
     handleClose();
   };
@@ -238,9 +268,6 @@ const ADMINProducts = ({ history }) => {
   const deleteHandler = (productId) => {
     if (window.confirm('Bạn có chắc không?')) {
       dispatch(adminDeleteProduct(productId));
-      setTimeout(() => {
-        dispatch(listProducts());
-      }, 500);
     }
   };
 
@@ -260,6 +287,42 @@ const ADMINProducts = ({ history }) => {
           </Modal.Header>
           <Modal.Body>
             <Form onSubmit={actualUpdateHandler}>
+              <Form.Group controlId='imgUpdate'>
+                <Form.Label>Hình ảnh</Form.Label>
+                <Row>
+                  <Col xl={7}>
+                    <Form.Control
+                      style={{ resize: 'none' }}
+                      type='text'
+                      as='textarea'
+                      rows={4}
+                      placeholder='Hình ảnh (dùng image url)'
+                      autoComplete='off'
+                      required
+                      value={imageUpdate}
+                      onChange={(e) => setImageUpdate(e.target.value)}
+                    ></Form.Control>
+                    <Form.Control.Feedback type='invalid'>
+                      Không được để trống!
+                    </Form.Control.Feedback>
+                  </Col>
+                  <Col xl={5}>
+                    <div style={{ display: 'flex' }}>
+                      <img
+                        style={{
+                          objectFit: 'cover',
+                          height: '125px',
+                          width: '170px',
+                        }}
+                        src={
+                          imageUpdate ||
+                          'https://vnpi-hcm.vn/wp-content/uploads/2018/01/no-image-800x600.png'
+                        }
+                      />
+                    </div>
+                  </Col>
+                </Row>
+              </Form.Group>
               <Form.Group controlId='name'>
                 <Form.Label>Tên sách</Form.Label>
                 <Form.Control
@@ -329,12 +392,9 @@ const ADMINProducts = ({ history }) => {
       setSoluong('');
       setGiasach('');
       setHinhanh('');
-      setTacgia(1);
-      setNhaxuatban(1);
-      setTheloai(1);
-      setTimeout(() => {
-        dispatch(listProducts());
-      }, 500);
+      setTacgia(null);
+      setNhaxuatban(null);
+      setTheloai(null);
       handleCloseCreate();
     } else setValidatedCreate(true);
   };
@@ -386,17 +446,39 @@ const ADMINProducts = ({ history }) => {
                     </Form.Group>
                     <Form.Group controlId='imgCreate'>
                       <Form.Label>Hình ảnh</Form.Label>
-                      <Form.Control
-                        type='text'
-                        placeholder='Hình ảnh'
-                        autoComplete='off'
-                        required
-                        value={hinhanh}
-                        onChange={(e) => setHinhanh(e.target.value)}
-                      ></Form.Control>
-                      <Form.Control.Feedback type='invalid'>
-                        Không được để trống!
-                      </Form.Control.Feedback>
+                      <Row>
+                        <Col xl={9}>
+                          <Form.Control
+                            style={{ resize: 'none' }}
+                            type='text'
+                            as='textarea'
+                            rows={4}
+                            placeholder='Hình ảnh (dùng image url)'
+                            autoComplete='off'
+                            required
+                            value={hinhanh}
+                            onChange={(e) => setHinhanh(e.target.value)}
+                          ></Form.Control>
+                          <Form.Control.Feedback type='invalid'>
+                            Không được để trống!
+                          </Form.Control.Feedback>
+                        </Col>
+                        <Col xl={3}>
+                          <div style={{ display: 'flex' }}>
+                            <img
+                              style={{
+                                objectFit: 'cover',
+                                height: '125px',
+                                width: '170px',
+                              }}
+                              src={
+                                hinhanh ||
+                                'https://vnpi-hcm.vn/wp-content/uploads/2018/01/no-image-800x600.png'
+                              }
+                            />
+                          </div>
+                        </Col>
+                      </Row>
                     </Form.Group>
                     <Form.Group controlId='stockCreate'>
                       <Form.Label>Số lượng</Form.Label>
@@ -428,153 +510,162 @@ const ADMINProducts = ({ history }) => {
                     </Form.Group>
                     <Row>
                       <Col md={6}>
-                        <Form.Group controlId='authorChoose'>
-                          <Form.Label className='mt-2'>Chọn tác giả</Form.Label>
-                          <Form.Control
-                            as='select'
-                            onChange={(e) => {
-                              setTacgia(e.target.value);
-                            }}
-                          >
-                            <option value={null}>--Chọn--</option>
-                            {!loadingAuthors &&
-                              !errorAuthors &&
-                              authors &&
-                              authors.map((item, i) => (
-                                <option value={`${item.id}`}>
-                                  {item.tentacgia}
-                                </option>
-                              ))}
-                          </Form.Control>
-                          <Form.Control.Feedback type='valid'>
-                            Có thể để trống
-                          </Form.Control.Feedback>
-                        </Form.Group>
-                      </Col>
-                      <Col md={6}>
-                        <Form noValidate>
-                          <Form.Group controlId='authorCreate'>
-                            <Button
-                              className='mt-1'
-                              variant='secondary'
-                              onClick={(e) => postAuthorHandler(e)}
-                            >
-                              <i className='fas fa-plus pe-3' /> Thêm tác giả
-                            </Button>
+                        <Row>
+                          <Form.Group controlId='authorChoose'>
+                            <Form.Label className='mt-2'>
+                              Chọn tác giả
+                            </Form.Label>
                             <Form.Control
-                              type='text'
-                              placeholder='Thêm tác giả'
-                              autoComplete='off'
-                              value={tacgiaCreate}
-                              onChange={(e) => setTacgiaCreate(e.target.value)}
-                            ></Form.Control>
+                              as='select'
+                              onChange={(e) => {
+                                setTacgia(e.target.value);
+                              }}
+                            >
+                              <option value={null}>--Chọn--</option>
+                              {!loadingAuthors &&
+                                !errorAuthors &&
+                                authors &&
+                                authors.map((item, i) => (
+                                  <option value={`${item.id}`}>
+                                    {item.tentacgia}
+                                  </option>
+                                ))}
+                            </Form.Control>
                             <Form.Control.Feedback type='valid'>
-                              Điền vào chỗ trống nếu muốn thêm mới, rồi bấm Thêm
-                              tác giả
+                              Có thể để trống
                             </Form.Control.Feedback>
                           </Form.Group>
-                        </Form>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col md={6}>
-                        <Form.Group controlId='publisherChoose'>
-                          <Form.Label className='mt-2'>
-                            Chọn nhà xuất bản
-                          </Form.Label>
-                          <Form.Control
-                            as='select'
-                            required
-                            onChange={(e) => setNhaxuatban(e.target.value)}
-                          >
-                            <option value={null}>--Chọn--</option>
-                            {!loadingPublishers &&
-                              !errorPublishers &&
-                              publishers &&
-                              publishers.map((item, i) => (
-                                <option value={`${item.id}`}>
-                                  {item.tennhaxuatban}
-                                </option>
-                              ))}
-                          </Form.Control>
-                          <Form.Control.Feedback type='valid'>
-                            Có thể để trống
-                          </Form.Control.Feedback>
-                        </Form.Group>
-                      </Col>
-                      <Col md={6}>
-                        <Form.Group controlId='publisherCreate'>
-                          <Button
-                            className='mt-1'
-                            variant='secondary'
-                            onClick={(e) => postPublisherHandler(e)}
-                          >
-                            <i className='fas fa-plus pe-3' /> Thêm nhà xuất bản
-                          </Button>
-                          <Form.Control
-                            type='text'
-                            placeholder='Thêm nhà xuất bản'
-                            autoComplete='off'
-                            value={nhaxuatbanCreate}
-                            onChange={(e) =>
-                              setNhaxuatbanCreate(e.target.value)
-                            }
-                          ></Form.Control>
-                          <Form.Control.Feedback type='valid'>
-                            Điền vào chỗ trống nếu muốn thêm mới, rồi bấm Thêm
-                            nhà xuất bản
-                          </Form.Control.Feedback>
-                        </Form.Group>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col md={6}>
-                        <Form.Group controlId='categoryChoose'>
-                          <Form.Label className='mt-2'>
-                            Chọn thể loại
-                          </Form.Label>
-                          <Form.Control
-                            as='select'
-                            required
-                            onChange={(e) => setTheloai(e.target.value)}
-                          >
-                            <option value={null}>--Chọn--</option>
-                            {!loadingCategories &&
-                              !errorCategories &&
-                              categories &&
-                              categories.map((item, i) => (
-                                <option value={`${item.id}`}>
-                                  {item.tentheloai}
-                                </option>
-                              ))}
-                          </Form.Control>
-                          <Form.Control.Feedback type='valid'>
-                            Có thể để trống
-                          </Form.Control.Feedback>
-                        </Form.Group>
+                        </Row>
+                        <Row>
+                          <Form.Group controlId='publisherChoose'>
+                            <Form.Label className='mt-2'>
+                              Chọn nhà xuất bản
+                            </Form.Label>
+                            <Form.Control
+                              as='select'
+                              required
+                              onChange={(e) => setNhaxuatban(e.target.value)}
+                            >
+                              <option value={null}>--Chọn--</option>
+                              {!loadingPublishers &&
+                                !errorPublishers &&
+                                publishers &&
+                                publishers.map((item, i) => (
+                                  <option value={`${item.id}`}>
+                                    {item.tennhaxuatban}
+                                  </option>
+                                ))}
+                            </Form.Control>
+                            <Form.Control.Feedback type='valid'>
+                              Có thể để trống
+                            </Form.Control.Feedback>
+                          </Form.Group>
+                        </Row>
+                        <Row>
+                          <Form.Group controlId='categoryChoose'>
+                            <Form.Label className='mt-2'>
+                              Chọn thể loại
+                            </Form.Label>
+                            <Form.Control
+                              as='select'
+                              required
+                              onChange={(e) => setTheloai(e.target.value)}
+                            >
+                              <option value={null}>--Chọn--</option>
+                              {!loadingCategories &&
+                                !errorCategories &&
+                                categories &&
+                                categories.map((item, i) => (
+                                  <option value={`${item.id}`}>
+                                    {item.tentheloai}
+                                  </option>
+                                ))}
+                            </Form.Control>
+                            <Form.Control.Feedback type='valid'>
+                              Có thể để trống
+                            </Form.Control.Feedback>
+                          </Form.Group>
+                        </Row>
                       </Col>
                       <Col md={6}>
-                        <Form.Group formNoValidate controlId='categoryCreate'>
-                          <Button
-                            className='mt-1'
-                            variant='secondary'
-                            onClick={(e) => postCategoryHandler(e)}
-                          >
-                            <i className='fas fa-plus pe-3' /> Thêm thể loại
-                          </Button>
-                          <Form.Control
-                            formNoValidate
-                            type='text'
-                            placeholder='Thêm thể loại'
-                            autoComplete='off'
-                            value={theloaiCreate}
-                            onChange={(e) => setTheloaiCreate(e.target.value)}
-                          ></Form.Control>
-                          <Form.Control.Feedback type='valid'>
-                            Điền vào chỗ trống nếu muốn thêm mới, rồi bấm Thêm
-                            thể loại
-                          </Form.Control.Feedback>
-                        </Form.Group>
+                        <Row>
+                          <Form noValidate>
+                            <Form.Group controlId='authorCreate'>
+                              <Form.Label className='mt-2'>
+                                Thêm tác giả
+                              </Form.Label>
+                              <div style={{ display: 'flex' }}>
+                                <Form.Control
+                                  type='text'
+                                  placeholder='Thêm tác giả'
+                                  autoComplete='off'
+                                  value={tacgiaCreate}
+                                  onChange={(e) =>
+                                    setTacgiaCreate(e.target.value)
+                                  }
+                                ></Form.Control>
+                                <Button
+                                  variant='secondary'
+                                  onClick={(e) => postAuthorHandler(e)}
+                                >
+                                  <i className='fas fa-plus ' />
+                                </Button>
+                              </div>
+                            </Form.Group>
+                          </Form>
+                        </Row>
+                        <Row>
+                          <Form noValidate>
+                            <Form.Group controlId='publisherCreate'>
+                              <Form.Label className='mt-2'>
+                                Thêm nhà xuất bản
+                              </Form.Label>
+                              <div style={{ display: 'flex' }}>
+                                <Form.Control
+                                  type='text'
+                                  placeholder='Thêm nhà xuất bản'
+                                  autoComplete='off'
+                                  value={nhaxuatbanCreate}
+                                  onChange={(e) =>
+                                    setNhaxuatbanCreate(e.target.value)
+                                  }
+                                ></Form.Control>
+                                <Button
+                                  variant='secondary'
+                                  onClick={(e) => postPublisherHandler(e)}
+                                >
+                                  <i className='fas fa-plus ' />
+                                </Button>
+                              </div>
+                            </Form.Group>
+                          </Form>
+                        </Row>
+                        <Row>
+                          <Form noValidate>
+                            <Form.Group controlId='authorCreate'>
+                              <Form.Label className='mt-2'>
+                                Thêm Thể loại
+                              </Form.Label>
+                              <div style={{ display: 'flex' }}>
+                                <Form.Control
+                                  type='text'
+                                  placeholder='Thêm Thể loại'
+                                  autoComplete='off'
+                                  value={theloaiCreate}
+                                  onChange={(e) =>
+                                    setTheloaiCreate(e.target.value)
+                                  }
+                                ></Form.Control>
+                                <Button
+                                  variant='secondary'
+                                  onClick={(e) => postCategoryHandler(e)}
+                                >
+                                  <i className='fas fa-plus ' />
+                                </Button>
+                              </div>
+                            </Form.Group>
+                          </Form>
+                        </Row>
                       </Col>
                     </Row>
                     <Button variant='dark' className='mt-3' type='submit'>
@@ -603,9 +694,6 @@ const ADMINProducts = ({ history }) => {
           tentacgia: tacgiaCreate,
         })
       );
-      setTimeout(() => {
-        dispatch(getProductAuthors());
-      }, 500);
     }
     setTacgiaCreate('');
   };
@@ -617,9 +705,6 @@ const ADMINProducts = ({ history }) => {
           tentheloai: theloaiCreate,
         })
       );
-      setTimeout(() => {
-        dispatch(getProductCategories());
-      }, 500);
     }
     setTheloaiCreate('');
   };
@@ -631,20 +716,29 @@ const ADMINProducts = ({ history }) => {
           tennhaxuatban: nhaxuatbanCreate,
         })
       );
-      setTimeout(() => {
-        dispatch(getProductPublishers());
-      }, 500);
     }
     setNhaxuatbanCreate('');
   };
 
   return (
     <>
-      <>
-        {loading && <Loader />}
-        {error && <Message variant='danger'>{error}</Message>}
-        {!loading && (
+      {renderUpdateModal()}
+      {renderCreateModal()}
+      {loading ? (
+        <Loader />
+      ) : error ? (
+        <Message variant='danger'>{error}</Message>
+      ) : (
+        !loading &&
+        !error &&
+        products && (
           <>
+            {(loadingPostAuthors ||
+              loadingPostCategories ||
+              loadingPostPublishers ||
+              loadingAdminPostProduct ||
+              loadingAdminUpdateProduct ||
+              loadingAdminDeleteProduct) && <Loader />}
             <Row>
               <Col>
                 <h2>Tất cả sản phẩm</h2>
@@ -710,11 +804,9 @@ const ADMINProducts = ({ history }) => {
                 ))}
               </tbody>
             </Table>
-            {renderUpdateModal()}
-            {renderCreateModal()}
           </>
-        )}
-      </>
+        )
+      )}
     </>
   );
 };
@@ -723,12 +815,12 @@ export default ADMINProducts;
 
 const renderUpdate = (props) => (
   <Tooltip id='button-tooltip' {...props}>
-    Update
+    Cập nhật
   </Tooltip>
 );
 
 const renderDelete = (props) => (
   <Tooltip id='button-tooltip' {...props}>
-    Delete
+    Xoá
   </Tooltip>
 );
