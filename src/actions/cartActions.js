@@ -45,18 +45,25 @@ export const addCartItem = (sachid, soluong) => async (dispatch, getState) => {
       userLogin: { userInfo },
     } = getState();
 
-    const { data } = await axios.post(
-      `https://testsachstore.herokuapp.com/api/cart/${userInfo.id}`,
-      {
-        api_sach: sachid,
-        soluong: soluong,
-      }
-    );
+    if (!userInfo)
+      dispatch({
+        type: CART_ADD_ITEM_FAIL,
+        payload: 'Bạn phải đăng nhập để có thể thêm sản phẩm vào giỏ!',
+      });
+    else {
+      const { data } = await axios.post(
+        `https://testsachstore.herokuapp.com/api/cart/${userInfo.id}`,
+        {
+          api_sach: sachid,
+          soluong: soluong,
+        }
+      );
 
-    dispatch({
-      type: CART_ADD_ITEM_SUCCESS,
-      payload: data,
-    });
+      dispatch({
+        type: CART_ADD_ITEM_SUCCESS,
+        payload: data,
+      });
+    }
   } catch (error) {
     dispatch({
       type: CART_ADD_ITEM_FAIL,
