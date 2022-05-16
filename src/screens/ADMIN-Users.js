@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Modal,
   OverlayTrigger,
   Table,
   Tooltip,
   Button,
-  Form,
   Row,
   Col,
 } from 'react-bootstrap';
@@ -19,6 +17,8 @@ import {
 import Loader from '../components/Loader';
 import Message from './../components/Message';
 import notify from '../utils/notify';
+import ModalFormAdminUpdateUser from '../components/forms/ModalFormAdminUpdateUser';
+import ModalFormAdminCreateUser from '../components/forms/ModalFormAdminCreateUser';
 
 const ADMINUsers = ({ history }) => {
   const [showCreate, setShowCreate] = useState(false);
@@ -50,9 +50,6 @@ const ADMINUsers = ({ history }) => {
 
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.userLogin);
-  const { loading: loadingUpdate } = useSelector(
-    (state) => state.adminUpdateUser
-  );
   const { users, loading, error } = useSelector(
     (state) => state.allUsersDetails
   );
@@ -142,6 +139,7 @@ const ADMINUsers = ({ history }) => {
     successAdminPostUser,
     successAdminUpdateUser,
   ]);
+
   const deleteUserHandler = (userId) => {
     if (window.confirm('Bạn có chắc không?')) {
       dispatch(adminDeleteUser(userId));
@@ -159,6 +157,7 @@ const ADMINUsers = ({ history }) => {
 
     handleShowUpdate();
   };
+
   const actualUpdateHandler = (e) => {
     e.preventDefault();
     dispatch(
@@ -170,107 +169,13 @@ const ADMINUsers = ({ history }) => {
         hoten: hotenUpdate,
       })
     );
-
     handleCloseUpdate();
-  };
-  const renderUpdateModal = () => {
-    return (
-      <>
-        <Modal
-          show={showUpdate}
-          onHide={handleCloseUpdate}
-          backdrop='static'
-          keyboard={false}
-          centered
-          size='md'
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>Cập nhật tài khoản</Modal.Title>
-          </Modal.Header>
-          <div>
-            <Modal.Body>
-              <Form onSubmit={actualUpdateHandler}>
-                <Form.Group controlId='nameUpdate'>
-                  <Form.Label>Tên tài khoản</Form.Label>
-                  <Form.Control
-                    type='text'
-                    placeholder='Tài khoản'
-                    disabled
-                    value={taikhoanUpdate}
-                    onChange={(e) => setTaikhoanUpdate(e.target.value)}
-                    autoComplete='off'
-                  ></Form.Control>
-                </Form.Group>
-                <Form.Group controlId='passwordUpdate'>
-                  <Form.Label>Mật khẩu</Form.Label>
-                  <Form.Control
-                    type='text'
-                    placeholder='Reset mật khẩu'
-                    value={matkhauUpdate}
-                    onChange={(e) => setMatkhauUpdate(e.target.value)}
-                    autoComplete='off'
-                  ></Form.Control>
-                </Form.Group>
-                <Form.Group controlId='imgUpdate'>
-                  <Form.Label>Họ tên</Form.Label>
-                  <Form.Control
-                    type='text'
-                    placeholder='Họ tên'
-                    value={hotenUpdate}
-                    onChange={(e) => setHotenUpdate(e.target.value)}
-                    autoComplete='off'
-                  ></Form.Control>
-                </Form.Group>
-                <Form.Group controlId='stockUpdate'>
-                  <Form.Label>Số điện thoại</Form.Label>
-                  <Form.Control
-                    type='text'
-                    maxLength={11}
-                    placeholder='Số điện thoại'
-                    value={sodienthoaiUpdate}
-                    onChange={(e) => setSodienthoaiUpdate(e.target.value)}
-                    autoComplete='off'
-                  ></Form.Control>
-                </Form.Group>
-                <Form.Group controlId='stockUpdate'>
-                  <Form.Label>Email</Form.Label>
-                  <Form.Control
-                    type='email'
-                    placeholder='Email'
-                    value={emailUpdate}
-                    onChange={(e) => setEmailUpdate(e.target.value)}
-                    autoComplete='off'
-                  ></Form.Control>
-                </Form.Group>
-                <Form.Group controlId='stockUpdate'>
-                  <Form.Label>Địa chỉ</Form.Label>
-                  <Form.Control
-                    type='text'
-                    placeholder='Địa chỉ'
-                    value={diachiUpdate}
-                    onChange={(e) => setDiachiUpdate(e.target.value)}
-                    autoComplete='off'
-                  ></Form.Control>
-                </Form.Group>
-                <Button variant='dark' className='mt-3' type='submit'>
-                  Sửa người dùng
-                </Button>
-              </Form>
-            </Modal.Body>
-          </div>
-          <Modal.Footer>
-            <Button variant='secondary' onClick={() => handleCloseUpdate()}>
-              Đóng
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </>
-    );
   };
 
   const createHandler = () => {
     handleShowCreate();
   };
+
   const actualCreateHandler = (e) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -296,144 +201,7 @@ const ADMINUsers = ({ history }) => {
       handleCloseCreate();
     } else setValidatedCreate(true);
   };
-  const renderCreateModal = () => {
-    return (
-      <>
-        <Modal
-          show={showCreate}
-          onHide={handleCloseCreate}
-          backdrop='static'
-          keyboard={false}
-          centered
-          size='md'
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>Thêm tài khoản mới</Modal.Title>
-          </Modal.Header>
-          <div>
-            <Modal.Body>
-              <Form
-                noValidate
-                validated={validatedCreate}
-                onSubmit={actualCreateHandler}
-              >
-                <Form.Group controlId='nameCreate'>
-                  <Form.Label>Tên tài khoản</Form.Label>
-                  <Form.Control
-                    type='text'
-                    placeholder='Tài khoản'
-                    required
-                    value={taikhoan}
-                    onChange={(e) => setTaikhoan(e.target.value)}
-                    autoComplete='off'
-                  ></Form.Control>
-                  <Form.Control.Feedback type='invalid'>
-                    Không được để trống!
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group controlId='passwordCreate'>
-                  <Form.Label>Mật khẩu</Form.Label>
-                  <Form.Control
-                    type='password'
-                    placeholder='Mật khẩu'
-                    required
-                    value={matkhau}
-                    onChange={(e) => setMatkhau(e.target.value)}
-                    autoComplete='off'
-                  ></Form.Control>
-                  <Form.Control.Feedback type='invalid'>
-                    Không được để trống!
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group controlId='imgCreate'>
-                  <Form.Label>Họ tên</Form.Label>
-                  <Form.Control
-                    type='text'
-                    placeholder='Họ tên'
-                    required
-                    value={hoten}
-                    onChange={(e) => setHoten(e.target.value)}
-                    autoComplete='off'
-                  ></Form.Control>
-                  <Form.Control.Feedback type='invalid'>
-                    Không được để trống!
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group controlId='stockCreate'>
-                  <Form.Label>Số điện thoại</Form.Label>
-                  <Form.Control
-                    type='text'
-                    maxLength={11}
-                    placeholder='Số điện thoại'
-                    value={sodienthoai}
-                    onChange={(e) => setSodienthoai(e.target.value)}
-                    autoComplete='off'
-                  ></Form.Control>
-                  <Form.Control.Feedback>
-                    Có thể để trống!
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group controlId='stockCreate'>
-                  <Form.Label>Email</Form.Label>
-                  <Form.Control
-                    type='text'
-                    placeholder='Email'
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    autoComplete='off'
-                  ></Form.Control>
-                  <Form.Control.Feedback>
-                    Có thể để trống!
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group controlId='stockCreate'>
-                  <Form.Label>Địa chỉ</Form.Label>
-                  <Form.Control
-                    type='text'
-                    placeholder='Địa chỉ'
-                    value={diachi}
-                    onChange={(e) => setDiachi(e.target.value)}
-                    autoComplete='off'
-                  ></Form.Control>
-                  <Form.Control.Feedback>
-                    Có thể để trống!
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Row>
-                  <Form.Group controlId='authorChoose'>
-                    <Form.Label>Chọn vai trò</Form.Label>
-                    <Form.Control
-                      as='select'
-                      required
-                      onChange={(e) => {
-                        setVaitro(e.target.value);
-                      }}
-                    >
-                      <option>--Chọn--</option>
-                      <option value='khachhang'>Khách hàng</option>
-                      <option value='admin'>Admin</option>
-                      <option value='nhanvien'>Nhân viên</option>
-                    </Form.Control>
-                    <Form.Control.Feedback>
-                      Mặc định là Khách hàng
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                </Row>
-                <Button variant='dark' className='mt-3' type='submit'>
-                  Thêm người dùng
-                </Button>
-              </Form>
-            </Modal.Body>
-          </div>
-          <Modal.Footer>
-            <Button variant='secondary' onClick={() => handleCloseCreate()}>
-              Đóng
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </>
-    );
-  };
+
   return (
     <>
       <h2>Tất cả người dùng</h2>
@@ -515,8 +283,43 @@ const ADMINUsers = ({ history }) => {
                   ))}
                 </tbody>
               </Table>
-              {renderCreateModal()}
-              {renderUpdateModal()}
+
+              <ModalFormAdminCreateUser
+                showCreate={showCreate}
+                handleCloseCreate={handleCloseCreate}
+                actualCreateHandler={actualCreateHandler}
+                taikhoan={taikhoan}
+                setTaikhoan={setTaikhoan}
+                matkhau={matkhau}
+                setMatkhau={setMatkhau}
+                hoten={hoten}
+                setHoten={setHoten}
+                email={email}
+                setEmail={setEmail}
+                sodienthoai={sodienthoai}
+                setSodienthoai={setSodienthoai}
+                diachi={diachi}
+                setDiachi={setDiachi}
+                setVaitro={setVaitro}
+                validatedCreate={validatedCreate}
+              />
+              <ModalFormAdminUpdateUser
+                showUpdate={showUpdate}
+                handleCloseUpdate={handleCloseUpdate}
+                actualUpdateHandler={actualUpdateHandler}
+                taikhoanUpdate={taikhoanUpdate}
+                setTaikhoanUpdate={setTaikhoanUpdate}
+                matkhauUpdate={matkhauUpdate}
+                setMatkhauUpdate={setMatkhauUpdate}
+                hotenUpdate={hotenUpdate}
+                setHotenUpdate={setHotenUpdate}
+                emailUpdate={emailUpdate}
+                setEmailUpdate={setEmailUpdate}
+                sodienthoaiUpdate={sodienthoaiUpdate}
+                setSodienthoaiUpdate={setSodienthoaiUpdate}
+                diachiUpdate={diachiUpdate}
+                setDiachiUpdate={setDiachiUpdate}
+              />
             </>
           )
         )}

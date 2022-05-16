@@ -21,7 +21,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <Header />
-      <main className='py-3 my-3'>
+      <main className='my-3 py-3'>
         <Container>
           <Route path='/' component={HomeScreen} exact />
           <Route path='/login' component={LoginScreen} />
